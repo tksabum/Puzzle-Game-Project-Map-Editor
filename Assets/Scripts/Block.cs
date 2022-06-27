@@ -2,8 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EditorTileTest : MonoBehaviour
+public class Block : MonoBehaviour
 {
+    SpriteRenderer spriteRenderer;
+
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,11 +25,16 @@ public class EditorTileTest : MonoBehaviour
 
     private void OnMouseEnter()
     {
-        Debug.Log("MouseEnter!!");
+        
     }
 
     private void OnMouseExit()
     {
-        Debug.Log("MouseExit!!");
+        
+    }
+
+    private void OnMouseDown()
+    {
+        
     }
 }
