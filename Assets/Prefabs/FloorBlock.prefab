@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 7182520262393273374}
   - component: {fileID: 7182520262393273375}
-  - component: {fileID: 7182520262393273372}
+  - component: {fileID: -803980858153503308}
   - component: {fileID: 7182520262393273373}
   m_Layer: 0
-  m_Name: Block
+  m_Name: FloorBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: da8987fd5e07ec243abd154f42555144, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 372f0cc789a339e4d9e13acc9c448893, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -91,7 +91,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7182520262393273372
+--- !u!114 &-803980858153503308
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -100,9 +100,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7182520262393273345}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43181114acc81364899a8dcc2a401245, type: 3}
+  m_Script: {fileID: 11500000, guid: 40684d2c32541ef4a8c4a4885d40728f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultSprite: {fileID: 21300000, guid: 372f0cc789a339e4d9e13acc9c448893, type: 2}
 --- !u!61 &7182520262393273373
 BoxCollider2D:
   m_ObjectHideFlags: 0
