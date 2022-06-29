@@ -24,6 +24,7 @@ public class Pallet : MonoBehaviour
     public Sprite spriteEmpty;
 
     Sprite selectedSprite;
+    BlockType selectedBlockType;
 
     BlockType currentBlockType;
     int currentPage;
@@ -49,6 +50,8 @@ public class Pallet : MonoBehaviour
                 detailPalletBlocks[i].Add(blockset.transform.GetChild(j).gameObject);
             }
         }
+
+        SelectBlock(spriteEmpty, BlockType.FLOOR);
     }
 
     // Start is called before the first frame update
@@ -252,11 +255,19 @@ public class Pallet : MonoBehaviour
         SelectTitle(-1);
     }
 
+    public void SelectBlock(Sprite sprite, BlockType blockType)
+    {
+        selectedSprite = sprite;
+        selectedBlockType = blockType;
+        DrawSelectedPallet();
+    }
+
     public void SelectDetail(Image image)
     {
         if (image.sprite != spriteEmpty)
         {
             selectedSprite = image.sprite;
+            selectedBlockType = currentBlockType;
             DrawSelectedPallet();
         }
     }
@@ -264,5 +275,10 @@ public class Pallet : MonoBehaviour
     public Sprite GetSelectedSprite()
     {
         return selectedSprite;
+    }
+
+    public BlockType GetSelectedBlockType()
+    {
+        return selectedBlockType;
     }
 }

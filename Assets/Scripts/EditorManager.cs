@@ -2,57 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using SimpleFileBrowser;
 
 public class EditorManager : MonoBehaviour
 {
-    [Header(" - Default Setting -")]
-    [Range(0, 99)]
-    public int defaultWidth;
-    [Range(0, 99)]
-    public int defaultHeight;
-
-    [Header("- Layer -")]
-    public DrawLayer floorLayer;
-    public DrawLayer itemLayer;
-
-    [Header("- UI -")]
-    public Toggle floorLayerSetting;
-    public Toggle itemLayerSetting;
-
     [Header("- Camera -")]
     public float zoomSpeed;
     public float cameraMoveSpeed;
     public float minCameraSize;
     public float maxCameraSize;
 
-    [SerializeField]
-    public List<Sprite> floorList;
-    [SerializeField]
-    public List<Sprite> itemList;
-
-    int width;
-    int height;
-
     bool isLeftMouseDown;
     bool isRightMouseDown;
 
     Vector3 lastMousePos;
 
+    string defaultPath;
+
     private void Awake()
     {
-        width = defaultWidth;
-        height = defaultHeight;
-
         isLeftMouseDown = false;
         isRightMouseDown = false;
 
-        InitSpriteList();
+        defaultPath = Application.dataPath + "/MapData";
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        ResizeMap();
+        
     }
 
     // Update is called once per frame
@@ -103,24 +81,20 @@ public class EditorManager : MonoBehaviour
         }
     }
 
-    void ResizeMap()
+    public void ButtonSave()
     {
-        floorLayer.Resize(width, height);
-        itemLayer.Resize(width, height);
+
     }
 
-    public void ActiveFloorLayer()
+    public void ButtonSaveAs()
     {
-        floorLayer.gameObject.SetActive(floorLayerSetting.isOn);
-    }
-    
-    public void ActiveItemLayer()
-    {
-        itemLayer.gameObject.SetActive(itemLayerSetting.isOn);
+        FileBrowser.ShowSaveDialog((paths) => { SaveAs(paths[0]); },
+                                   () => { },
+                                   FileBrowser.PickMode.Files, false, defaultPath, null, "Save As", "Save");
     }
 
-    void InitSpriteList()
+    void SaveAs(string path)
     {
-        
+
     }
 }
