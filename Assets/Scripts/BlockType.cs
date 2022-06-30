@@ -5,5 +5,7 @@ using UnityEngine;
 public enum BlockType
 {
     FLOOR,
-    ITEM
+    ITEM,
+    POWER,
+    PORTAL
 }
