@@ -6,6 +6,4 @@ public enum BlockType
 {
     FLOOR,
     ITEM,
-    POWER,
-    PORTAL
 }

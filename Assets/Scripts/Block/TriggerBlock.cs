@@ -10,7 +10,9 @@ public class TriggerBlock : MonoBehaviour
     Vector2Int idx;
 
     bool isMouseEntered;
+    bool isMouseLeftClicked;
     bool isMouseRightClicked;
+    Vector3 lastMouseLeftClickedPos;
     Vector3 lastMouseRightClickedPos;
 
     private void Awake()
@@ -18,7 +20,9 @@ public class TriggerBlock : MonoBehaviour
         drawLayer = GameObject.Find("DrawLayer").GetComponent<DrawLayer>();
 
         isMouseEntered = false;
+        isMouseLeftClicked = false;
         isMouseRightClicked = false;
+        lastMouseLeftClickedPos = Vector3.zero;
         lastMouseRightClickedPos = Vector3.zero;
     }
 
@@ -38,9 +42,30 @@ public class TriggerBlock : MonoBehaviour
             }
             else if (Input.GetMouseButtonUp(1))
             {
-                Debug.Log("타일정보창 열기");
+                drawLayer.TriggerMouseRightClick(idx);
             }
         }
+
+
+        if (isMouseEntered && Input.GetMouseButtonDown(0))
+        {
+            isMouseLeftClicked = true;
+            lastMouseLeftClickedPos = Input.mousePosition;
+        }
+
+        if (isMouseLeftClicked)
+        {
+            if (lastMouseLeftClickedPos != Input.mousePosition)
+            {
+                isMouseLeftClicked = false;
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                drawLayer.TriggerMouseLeftClick(idx);
+            }
+        }
+
+
     }
 
     private void OnMouseEnter()

@@ -10,10 +10,16 @@ public class Block : MonoBehaviour
 
     Sprite currentSprite;
 
+    HashSet<Vector2Int> providers;
+    HashSet<Vector2Int> targets;
+
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         currentSprite = DefaultSprite;
+
+        providers = new HashSet<Vector2Int>();
+        targets = new HashSet<Vector2Int>();
     }
 
     public void Paint(Sprite sprite)
@@ -37,5 +43,18 @@ public class Block : MonoBehaviour
         
     }
 
-    
+    public Sprite GetSprite()
+    {
+        return currentSprite;
+    }
+
+    public HashSet<Vector2Int> GetProviders()
+    {
+        return providers;
+    }
+
+    public HashSet<Vector2Int> GetTargets()
+    {
+        return targets;
+    }
 }
