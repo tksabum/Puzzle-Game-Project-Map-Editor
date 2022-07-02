@@ -36,6 +36,12 @@ public class DrawLayer : MonoBehaviour
 
     bool isOpenedBlockSetting;
     Block currentSelectedBlock;
+    Vector2Int currentSelectedIdx;
+
+    HighLightBlock.Color emptyColor = HighLightBlock.Color.EMPTY;
+    HighLightBlock.Color providerColor = HighLightBlock.Color.GREEN;
+    HighLightBlock.Color targetColor = HighLightBlock.Color.BLUE;
+
 
     private void Awake()
     {
@@ -45,7 +51,9 @@ public class DrawLayer : MonoBehaviour
             floorBlocks.Add(new List<GameObject>());
             for (int j = 0; j < 99; j++)
             {
-                floorBlocks[i].Add(Instantiate(floorBlock, new Vector3(i, j, 0), Quaternion.identity, floorLayer.transform));
+                GameObject inst = Instantiate(floorBlock, new Vector3(i, j, 0), Quaternion.identity, floorLayer.transform);
+                inst.GetComponent<Block>().SetIdx(new Vector2Int(i, j));
+                floorBlocks[i].Add(inst);
             }
         }
 
@@ -128,6 +136,10 @@ public class DrawLayer : MonoBehaviour
     public void ActiveFloorLayer()
     {
         floorLayer.SetActive(floorLayerSetting.isOn);
+        if (!floorLayer.activeInHierarchy)
+        {
+            CloseBlockSettingWindow();
+        }
     }
 
     public void ActiveItemLayer()
@@ -162,7 +174,27 @@ public class DrawLayer : MonoBehaviour
             Sprite selectedSprite = pallet.GetSelectedSprite();
             if (selectedSprite != pallet.spriteEmpty)
             {
-                floorBlocks[idx.x][idx.y].GetComponent<Block>().PaintOver(selectedSprite);
+                Block block = floorBlocks[idx.x][idx.y].GetComponent<Block>();
+                bool isOver = block.PaintOver(selectedSprite);
+                
+                // block의 targets, providers 초기화
+                if (isOver)
+                {
+                    HashSet<Vector2Int> targets = block.GetTargets();
+                    HashSet<Vector2Int> providers = block.GetProviders();
+
+                    foreach (Vector2Int target in targets)
+                    {
+                        floorBlocks[target.x][target.y].GetComponent<Block>().RemoveProvider(idx);
+                    }
+                    
+                    foreach(Vector2Int provider in providers)
+                    {
+                        floorBlocks[provider.x][provider.y].GetComponent<Block>().RemoveTarget(idx);
+                    }
+                    targets.Clear();
+                    providers.Clear();
+                }
             }
         }
         else if (pallet.GetSelectedBlockType() == BlockType.ITEM)
@@ -202,24 +234,57 @@ public class DrawLayer : MonoBehaviour
     {
         if (isOpenedBlockSetting)
         {
+            int funcResult = currentSelectedBlock.AddTarget(idx);
 
+            // 선택
+            if (funcResult == 1)
+            {
+                highlightBlocks[idx.x][idx.y].GetComponent<HighLightBlock>().SetColor(targetColor);
+                floorBlocks[idx.x][idx.y].GetComponent<Block>().AddProvider(currentSelectedIdx);
+                blockSettingWindow.Refresh(currentSelectedIdx, currentSelectedBlock);
+            }
+            // 선택 취소
+            else if (funcResult == -1)
+            {
+                highlightBlocks[idx.x][idx.y].GetComponent<HighLightBlock>().SetColor(emptyColor);
+                floorBlocks[idx.x][idx.y].GetComponent<Block>().RemoveProvider(currentSelectedIdx);
+                blockSettingWindow.Refresh(currentSelectedIdx, currentSelectedBlock);
+            }
+            // 선택 불가
+            else if (funcResult == 0) { }
         }
     }
 
     public void TriggerMouseRightClick(Vector2Int idx)
     {
-        OpenBlockSettingWindow(idx);
+        bool isFloorActive = floorLayer.activeInHierarchy;
+        if (true == isFloorActive)
+        {
+            OpenBlockSettingWindow(idx);
+        }
     }
 
-    void ShowHighLight(Vector2Int selectedIdx)
+    public void ResetTargets()
+    {
+        HashSet<Vector2Int> targets = currentSelectedBlock.GetTargets();
+        foreach (Vector2Int target in targets)
+        {
+            floorBlocks[target.x][target.y].GetComponent<Block>().RemoveProvider(currentSelectedIdx);
+        }
+        targets.Clear();
+        blockSettingWindow.Refresh(currentSelectedIdx, currentSelectedBlock);
+        RefreshHighLight();
+    }
+
+    void RefreshHighLight()
     {
         for (int i = 0; i < mapWidth; i++)
         {
             for (int j = 0; j < mapHeight; j++)
             {
-                if (i == selectedIdx.x && j == selectedIdx.y)
+                if (i == currentSelectedIdx.x && j == currentSelectedIdx.y)
                 {
-                    highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(HighLightBlock.Color.GREEN);
+                    highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(providerColor);
                 }
                 else
                 {
@@ -227,6 +292,17 @@ public class DrawLayer : MonoBehaviour
                 }
             }
         }
+
+        HashSet<Vector2Int> targets = currentSelectedBlock.GetTargets();
+        foreach (Vector2Int target in targets)
+        {
+            highlightBlocks[target.x][target.y].GetComponent<HighLightBlock>().SetColor(targetColor);
+        }
+    }
+
+    void ShowHighLight()
+    {
+        RefreshHighLight();
 
         highlightLayer.SetActive(true);
     }
@@ -239,12 +315,13 @@ public class DrawLayer : MonoBehaviour
     void OpenBlockSettingWindow(Vector2Int selectedIdx)
     {
         currentSelectedBlock = floorBlocks[selectedIdx.x][selectedIdx.y].GetComponent<Block>();
+        currentSelectedIdx = selectedIdx;
         isOpenedBlockSetting = blockSettingWindow.Open(selectedIdx, currentSelectedBlock);
         if (isOpenedBlockSetting)
         {
             floorBlocks[selectedIdx.x][selectedIdx.y].GetComponent<Block>().Erase();
             itemBlocks[selectedIdx.x][selectedIdx.y].GetComponent<Block>().Erase();
-            ShowHighLight(selectedIdx);
+            ShowHighLight();
         }
         else
         {
@@ -256,6 +333,7 @@ public class DrawLayer : MonoBehaviour
     void CloseBlockSettingWindow()
     {
         isOpenedBlockSetting = false;
+        HideHighLight();
         blockSettingWindow.Close();
     }
 }

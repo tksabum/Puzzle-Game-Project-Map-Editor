@@ -8,6 +8,7 @@ public class BlockSettingWindow : MonoBehaviour
 {
     public TMP_Text textBlockType;
     public TMP_Text textBlockIdx;
+    public TMP_Text textNumberOfTarget;
 
     public GameObject textEmpty;
     public List<TMP_Text> textTargets;
@@ -29,9 +30,24 @@ public class BlockSettingWindow : MonoBehaviour
             return false;
         }
 
-        HashSet<Vector2Int>targets = selectedBlock.GetTargets();
+        isOpened = true;
+        currentIdx = selectedIdx;
+
+        Refresh(selectedIdx, selectedBlock);
+
+        gameObject.SetActive(true);
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
+
+        return true;
+    }
+
+    public void Refresh(Vector2Int selectedIdx, Block selectedBlock)
+    {
+        // targets
+        HashSet<Vector2Int> targets = selectedBlock.GetTargets();
         int cnt = 0;
-        foreach(var target in targets)
+        foreach (var target in targets)
         {
             textTargets[cnt].text = "(" + target.x + ", " + target.y + ")";
             textTargets[cnt].gameObject.SetActive(true);
@@ -42,6 +58,7 @@ public class BlockSettingWindow : MonoBehaviour
             textTargets[cnt].gameObject.SetActive(false);
         }
 
+        // text empty
         if (targets.Count == 0)
         {
             textEmpty.SetActive(true);
@@ -51,16 +68,33 @@ public class BlockSettingWindow : MonoBehaviour
             textEmpty.SetActive(false);
         }
 
+        // text block type
+        string spriteName = selectedBlock.GetSprite().name;
+        int substringLength = spriteName.IndexOf('_');
+        if (substringLength < 0)
+        {
+            substringLength = spriteName.Length;
+        }
+        textBlockType.text = spriteName.Substring(0, substringLength);
 
-        isOpened = true;
-        currentIdx = selectedIdx;
-
+        // text block idx
         textBlockIdx.text = "(" + selectedIdx.x + ", " + selectedIdx.y + ")";
-        gameObject.SetActive(true);
+
+        // number of target
+        if (spriteName.Contains("Button_"))
+        {
+            textNumberOfTarget.text = "(" + selectedBlock.GetTargets().Count + " / 20)";
+        }
+        else if (spriteName.Contains("Portal_"))
+        {
+            textNumberOfTarget.text = "(" + selectedBlock.GetTargets().Count + " / 1)";
+        }
+        else
+        {
+            textNumberOfTarget.text = "(0 / 0)";
+        }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
-
-        return true;
     }
     
     public void Close()

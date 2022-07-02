@@ -15,6 +15,8 @@ public class TriggerBlock : MonoBehaviour
     Vector3 lastMouseLeftClickedPos;
     Vector3 lastMouseRightClickedPos;
 
+    float mouseTolerance = Vector3.SqrMagnitude(new Vector3(3, 3, 0));
+
     private void Awake()
     {
         drawLayer = GameObject.Find("DrawLayer").GetComponent<DrawLayer>();
@@ -36,13 +38,16 @@ public class TriggerBlock : MonoBehaviour
 
         if (isMouseRightClicked)
         {
-            if (lastMouseRightClickedPos != Input.mousePosition)
+            if (Vector3.SqrMagnitude(lastMouseRightClickedPos - Input.mousePosition) > mouseTolerance)
             {
                 isMouseRightClicked = false;
             }
             else if (Input.GetMouseButtonUp(1))
             {
-                drawLayer.TriggerMouseRightClick(idx);
+                if (!EventSystem.current.IsPointerOverGameObject())
+                {
+                    drawLayer.TriggerMouseRightClick(idx);
+                }
             }
         }
 
@@ -55,13 +60,16 @@ public class TriggerBlock : MonoBehaviour
 
         if (isMouseLeftClicked)
         {
-            if (lastMouseLeftClickedPos != Input.mousePosition)
+            if (Vector3.SqrMagnitude(lastMouseLeftClickedPos - Input.mousePosition) > mouseTolerance)
             {
                 isMouseLeftClicked = false;
             }
             else if (Input.GetMouseButtonUp(0))
             {
-                drawLayer.TriggerMouseLeftClick(idx);
+                if (!EventSystem.current.IsPointerOverGameObject())
+                {
+                    drawLayer.TriggerMouseLeftClick(idx);
+                }
             }
         }
 
