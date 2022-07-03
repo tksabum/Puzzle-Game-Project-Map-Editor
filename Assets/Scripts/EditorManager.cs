@@ -6,6 +6,10 @@ using SimpleFileBrowser;
 
 public class EditorManager : MonoBehaviour
 {
+    [Header("- Core -")]
+    public DrawLayer drawLayer;
+    public SizeController sizeController;
+
     [Header("- Camera -")]
     public float zoomSpeed;
     public float cameraMoveSpeed;
@@ -19,18 +23,29 @@ public class EditorManager : MonoBehaviour
 
     string defaultPath;
 
+    string mapDesigner;
+    Vector2Int startIdx;
+    int startLife;
+    int maxLife;
+
     private void Awake()
     {
         isLeftMouseDown = false;
         isRightMouseDown = false;
 
         defaultPath = Application.dataPath + "/MapData";
+
+        mapDesigner = "UnKnownDesigner";
+        startIdx = new Vector2Int(0, 0);
+        startLife = 1;
+        maxLife = 1;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        sizeController.Init();
+        drawLayer.Init();
     }
 
     // Update is called once per frame
@@ -79,6 +94,11 @@ public class EditorManager : MonoBehaviour
             Camera.main.transform.position -= Camera.main.ScreenToWorldPoint(Input.mousePosition) - lastMousePos;
             lastMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
+    }
+
+    public Vector2Int GetStartIdx()
+    {
+        return startIdx;
     }
 
     public void ButtonSave()

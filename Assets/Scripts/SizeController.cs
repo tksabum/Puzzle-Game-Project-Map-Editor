@@ -31,16 +31,9 @@ public class SizeController : MonoBehaviour
         isOpenedController = false;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public void Init()
     {
         Resize();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void OpenCloseController()

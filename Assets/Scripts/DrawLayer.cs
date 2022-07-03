@@ -7,6 +7,7 @@ public class DrawLayer : MonoBehaviour
 {
     [Header("- Core -")]
     public Pallet pallet;
+    public EditorManager editorManager;
 
     [Header("- Layer -")]
     public GameObject floorLayer;
@@ -37,6 +38,8 @@ public class DrawLayer : MonoBehaviour
     bool isOpenedBlockSetting;
     Block currentSelectedBlock;
     Vector2Int currentSelectedIdx;
+
+    HighLightBlock.Color startIdxColor = HighLightBlock.Color.RED;
 
     HighLightBlock.Color emptyColor = HighLightBlock.Color.EMPTY;
     HighLightBlock.Color providerColor = HighLightBlock.Color.GREEN;
@@ -94,16 +97,9 @@ public class DrawLayer : MonoBehaviour
         isOpenedBlockSetting = false;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public void Init()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        CloseBlockSettingWindow();
     }
 
     public void Resize(int width, int height)
@@ -273,10 +269,10 @@ public class DrawLayer : MonoBehaviour
         }
         targets.Clear();
         blockSettingWindow.Refresh(currentSelectedIdx, currentSelectedBlock);
-        RefreshHighLight();
+        RefreshHighLightSettingMode();
     }
 
-    void RefreshHighLight()
+    void RefreshHighLightSettingMode()
     {
         for (int i = 0; i < mapWidth; i++)
         {
@@ -300,16 +296,31 @@ public class DrawLayer : MonoBehaviour
         }
     }
 
-    void ShowHighLight()
+    void HighLightSettingMode()
     {
-        RefreshHighLight();
+        RefreshHighLightSettingMode();
 
         highlightLayer.SetActive(true);
     }
 
-    void HideHighLight()
+    void HighLightPaintingMode()
     {
-        highlightLayer.SetActive(false);
+        for (int i = 0; i < mapWidth; i++)
+        {
+            for (int j = 0; j < mapHeight; j++)
+            {
+                if (i == editorManager.GetStartIdx().x && j == editorManager.GetStartIdx().y)
+                {
+                    highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(startIdxColor);
+                }
+                else
+                {
+                    highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(HighLightBlock.Color.EMPTY);
+                }
+            }
+        }
+
+        highlightLayer.SetActive(true);
     }
 
     void OpenBlockSettingWindow(Vector2Int selectedIdx)
@@ -321,19 +332,19 @@ public class DrawLayer : MonoBehaviour
         {
             floorBlocks[selectedIdx.x][selectedIdx.y].GetComponent<Block>().Erase();
             itemBlocks[selectedIdx.x][selectedIdx.y].GetComponent<Block>().Erase();
-            ShowHighLight();
+            HighLightSettingMode();
         }
         else
         {
             Paint(selectedIdx);
-            HideHighLight();
+            HighLightPaintingMode();
         }
     }
 
     void CloseBlockSettingWindow()
     {
         isOpenedBlockSetting = false;
-        HideHighLight();
+        HighLightPaintingMode();
         blockSettingWindow.Close();
     }
 }
