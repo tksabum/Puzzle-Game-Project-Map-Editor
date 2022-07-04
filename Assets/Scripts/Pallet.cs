@@ -51,20 +51,14 @@ public class Pallet : MonoBehaviour
             }
         }
 
-        SelectBlock(spriteEmpty, BlockType.FLOOR);
+        Init();
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public void Init()
     {
+        SelectBlock(spriteEmpty, BlockType.FLOOR);
         SelectPalletType(BlockType.FLOOR);
         SelectTitle(-1);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     void SelectPalletType(BlockType blockType)

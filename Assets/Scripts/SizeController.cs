@@ -19,7 +19,6 @@ public class SizeController : MonoBehaviour
     public TMP_InputField newWidth;
     public TMP_InputField newHeight;
 
-
     bool isOpenedController;
     Vector2Int currentMapSize;
 

@@ -347,4 +347,19 @@ public class DrawLayer : MonoBehaviour
         HighLightPaintingMode();
         blockSettingWindow.Close();
     }
+
+    public Vector2Int GetMapSize()
+    {
+        return new Vector2Int(mapWidth, mapHeight);
+    }
+
+    public Block GetItemBlock(int x, int y)
+    {
+        return itemBlocks[x][y].GetComponent<Block>();
+    }
+
+    public Block GetFloorBlock(int x, int y)
+    {
+        return floorBlocks[x][y].GetComponent<Block>();
+    }
 }
