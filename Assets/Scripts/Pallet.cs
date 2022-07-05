@@ -275,4 +275,36 @@ public class Pallet : MonoBehaviour
     {
         return selectedBlockType;
     }
+
+    public Sprite GetFloorSprite(string floorName)
+    {
+        foreach(BlockSetComponent floorBlockSet in floorList)
+        {
+            foreach (Sprite sprite in floorBlockSet.sprites)
+            {
+                if (floorName == sprite.name)
+                {
+                    return sprite;
+                }
+            }
+        }
+
+        throw new System.Exception("Error: floorList에 " + floorName + "이 존재하지 않음");
+    }
+
+    public Sprite GetItemSprite(string itemName)
+    {
+        foreach(BlockSetComponent itemBlockSet in itemList)
+        {
+            foreach(Sprite sprite in itemBlockSet.sprites)
+            {
+                if (itemName == sprite.name)
+                {
+                    return sprite;
+                }
+            }
+        }
+
+        throw new System.Exception("Error: itemList에 " + itemName + "이 존재하지 않음");
+    }
 }

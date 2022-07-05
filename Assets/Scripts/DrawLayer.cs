@@ -93,13 +93,89 @@ public class DrawLayer : MonoBehaviour
                 highlightBlocks[i].Add(Instantiate(highlightBlock, new Vector3(i, j, 0), Quaternion.identity, highlightLayer.transform));
             }
         }
-
-        isOpenedBlockSetting = false;
     }
 
     public void Init()
     {
+        isOpenedBlockSetting = false;
         CloseBlockSettingWindow();
+    }
+
+    public void InitBlocks(MapData mapData)
+    {
+        Dictionary<string, Sprite> floorDic = new Dictionary<string, Sprite>();
+        Dictionary<string, Sprite> itemDic = new Dictionary<string, Sprite>();
+
+        for (int i = 0; i < mapWidth; i++)
+        {
+            for (int j = 0; j < mapHeight; j++)
+            {
+                floorBlocks[i][j].GetComponent<Block>().Clear();
+            }
+        }
+
+        for (int i = 0; i < mapWidth; i++)
+        {
+            for (int j = 0; j < mapHeight; j++)
+            {
+                string floorName = mapData.floorData[i][j];
+                Sprite floorSprite = null;
+                if (floorDic.ContainsKey(floorName))
+                {
+                    floorSprite = floorDic[floorName];
+                }
+                else
+                {
+                    floorSprite = pallet.GetFloorSprite(floorName);
+                    floorDic[floorName] = floorSprite;
+                }
+
+                floorBlocks[i][j].GetComponent<Block>().PaintOver(floorSprite);
+
+
+                string itemName = mapData.itemData[i][j];
+                Sprite itemSprite = null;
+                if (itemName != "")
+                {
+                    if (itemDic.ContainsKey(itemName))
+                    {
+                        itemSprite = itemDic[itemName];
+                    }
+                    else
+                    {
+                        itemSprite = pallet.GetItemSprite(itemName);
+                        itemDic[itemName] = itemSprite;
+                    }
+                }
+
+                itemBlocks[i][j].GetComponent<Block>().PaintOver(itemSprite);
+            }
+        }
+
+        foreach (KeyValuePair<PairInt, List<PairInt>> keyValuePair in mapData.powerData)
+        {
+            PairInt pairInt = keyValuePair.Key;
+            List<PairInt> list = keyValuePair.Value;
+            Vector2Int provider = new Vector2Int(pairInt.x, pairInt.y);
+
+            foreach(PairInt pair in list)
+            {
+                Vector2Int target = new Vector2Int(pair.x, pair.y);
+                floorBlocks[provider.x][provider.y].GetComponent<Block>().AddTarget(target);
+                floorBlocks[target.x][target.y].GetComponent<Block>().AddProvider(provider);
+            }
+        }
+
+        foreach (KeyValuePair<PairInt, PairInt> keyValuePair in mapData.portalData)
+        {
+            PairInt key = keyValuePair.Key;
+            PairInt value = keyValuePair.Value;
+            Vector2Int provider = new Vector2Int(key.x, key.y);
+            Vector2Int target = new Vector2Int(value.x, value.y);
+
+            floorBlocks[provider.x][provider.y].GetComponent<Block>().AddTarget(target);
+            floorBlocks[target.x][target.y].GetComponent<Block>().AddProvider(provider);
+        }
     }
 
     public void Resize(int width, int height)
@@ -270,6 +346,18 @@ public class DrawLayer : MonoBehaviour
         targets.Clear();
         blockSettingWindow.Refresh(currentSelectedIdx, currentSelectedBlock);
         RefreshHighLightSettingMode();
+    }
+
+    public void RefreshHighLight()
+    {
+        if (isOpenedBlockSetting)
+        {
+            RefreshHighLightSettingMode();
+        }
+        else
+        {
+            HighLightPaintingMode();
+        }
     }
 
     void RefreshHighLightSettingMode()

@@ -118,6 +118,7 @@ public class Setting : MonoBehaviour
         editorManager.SetStartIdx(new Vector2Int(int.Parse(inputFieldStartIndexX.text), int.Parse(inputFieldStartIndexY.text)));
         editorManager.SetStartLife(int.Parse(inputFieldStartLife.text));
         editorManager.SetMaxLife(int.Parse(inputFieldMaxLife.text));
+        drawLayer.RefreshHighLight();
         CloseSettingWindow();
     }
 

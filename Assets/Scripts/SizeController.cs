@@ -32,7 +32,12 @@ public class SizeController : MonoBehaviour
 
     public void Init()
     {
-        Resize();
+        Resize(defaultWidth, defaultHeight);
+    }
+
+    public void Init(int x, int y)
+    {
+        Resize(x, y);
     }
 
     public void OpenCloseController()
@@ -54,6 +59,13 @@ public class SizeController : MonoBehaviour
     {
         textMapSize.text = currentMapSize.x + " X " + currentMapSize.y;
         drawLayer.Resize(currentMapSize.x, currentMapSize.y);
+    }
+
+    void Resize(int x, int y)
+    {
+        currentMapSize.x = x;
+        currentMapSize.y = y;
+        Resize();
     }
 
     public void ResizeWithController()

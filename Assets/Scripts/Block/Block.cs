@@ -55,7 +55,8 @@ public class Block : MonoBehaviour
 
     public void Clear()
     {
-        
+        providers.Clear();
+        targets.Clear();
     }
 
     public Sprite GetSprite()

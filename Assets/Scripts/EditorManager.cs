@@ -143,9 +143,17 @@ public class EditorManager : MonoBehaviour
         maxLife = _maxLife;
     }
 
+    public void ButtonNew()
+    {
 
+    }
 
-
+    public void ButtonOpen()
+    {
+        FileBrowser.ShowLoadDialog((paths) => { Load(paths[0]); },
+                                   () => { },
+                                   FileBrowser.PickMode.Files, false, defaultFolderPath, null, "Load", "Select");
+    }
 
     public void ButtonSave()
     {
@@ -164,6 +172,28 @@ public class EditorManager : MonoBehaviour
         FileBrowser.ShowSaveDialog((paths) => { SaveAs(paths[0] + ".dat"); },
                                    () => { },
                                    FileBrowser.PickMode.Files, false, defaultFolderPath, null, "Save As", "Save");
+    }
+
+    void Load(string path)
+    {
+        if (File.Exists(path))
+        {
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            FileStream file = File.Open(path, FileMode.Open);
+            MapData mapData = (MapData)binaryFormatter.Deserialize(file);
+            file.Close();
+
+            mapDesigner = mapData.mapDesigner;
+            startIdx = new Vector2Int(mapData.startIdx.x, mapData.startIdx.y);
+            startLife = mapData.startLife;
+            maxLife = mapData.maxLife;
+            sizeController.Init(mapData.mapWidth, mapData.mapHeight);
+            drawLayer.InitBlocks(mapData);
+        }
+        else
+        {
+            throw new System.Exception("데이터 불러오기 실패");
+        }
     }
 
     void SaveAs(string path)
@@ -229,18 +259,24 @@ public class EditorManager : MonoBehaviour
                         targetList.Add(new PairInt(target.x, target.y));
                     }
 
-                    mapData.powerData.Add(new PairInt(i, j), targetList);
+                    if (targetList.Count > 0)
+                    {
+                        mapData.powerData.Add(new PairInt(i, j), targetList);
+                    }
                 }
                 else if (floorBlock.GetSprite().name.Contains("Portal_"))
                 {
                     HashSet<Vector2Int> targets = floorBlock.GetTargets();
-                    PairInt targetPair = new PairInt(0, 0);
+                    PairInt targetPair = null;
                     foreach(Vector2Int target in targets)
                     {
                         targetPair = new PairInt(target.x, target.y);
                     }
 
-                    mapData.portalData.Add(new PairInt(i, j), targetPair);
+                    if (targetPair != null)
+                    {
+                        mapData.portalData.Add(new PairInt(i, j), targetPair);
+                    }
                 }
             }
         }
