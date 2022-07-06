@@ -25,14 +25,16 @@ public class EditorManager : MonoBehaviour
     Vector3 lastMousePos;
 
     string defaultFolderPath;
-    string filePath;
-
     const string DefaultFileName = "EmptyMap";
+    string filePath;
+    string fileName;
 
     string mapDesigner;
     Vector2Int startIdx;
     int startLife;
     int maxLife;
+
+    bool isSaved;
 
     private void Awake()
     {
@@ -41,11 +43,14 @@ public class EditorManager : MonoBehaviour
 
         defaultFolderPath = Application.dataPath + "/MapData";
 
+        fileName = DefaultFileName;
         filePath = defaultFolderPath + "/" + DefaultFileName + ".dat";
         mapDesigner = "UnKnownDesigner";
         startIdx = new Vector2Int(0, 0);
         startLife = 1;
         maxLife = 1;
+
+        isSaved = false;
     }
 
     // Start is called before the first frame update
@@ -145,7 +150,16 @@ public class EditorManager : MonoBehaviour
 
     public void ButtonNew()
     {
+        fileName = DefaultFileName;
+        filePath = defaultFolderPath + "/" + DefaultFileName + ".dat";
+        mapDesigner = "UnKnownDesigner";
+        startIdx = new Vector2Int(0, 0);
+        startLife = 1;
+        maxLife = 1;
 
+        sizeController.Init();
+        drawLayer.InitBlocks();
+        drawLayer.Init();
     }
 
     public void ButtonOpen()
@@ -157,7 +171,7 @@ public class EditorManager : MonoBehaviour
 
     public void ButtonSave()
     {
-        if (filePath == defaultFolderPath + "/" + DefaultFileName + ".dat")
+        if (fileName == DefaultFileName)
         {
             ButtonSaveAs();
         }
@@ -178,6 +192,12 @@ public class EditorManager : MonoBehaviour
     {
         if (File.Exists(path))
         {
+            int lastindexofslash = path.LastIndexOf('/');
+            fileName = path.Substring(lastindexofslash + 1, path.Length - (lastindexofslash + 1));
+            fileName.Substring(0, fileName.LastIndexOf(".dat"));
+            filePath = path;
+
+
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             FileStream file = File.Open(path, FileMode.Open);
             MapData mapData = (MapData)binaryFormatter.Deserialize(file);
@@ -198,10 +218,15 @@ public class EditorManager : MonoBehaviour
 
     void SaveAs(string path)
     {
-        if (File.Exists(path))
-        {
-            throw new System.Exception("이미 존재함");
-        }
+        //if (File.Exists(path))
+        //{
+        //    throw new System.Exception("이미 존재함");
+        //}
+
+        int lastindexofslash = path.LastIndexOf('/');
+        fileName = path.Substring(lastindexofslash + 1, path.Length - (lastindexofslash + 1));
+        fileName.Substring(0, fileName.LastIndexOf(".dat"));
+        filePath = path;
 
         // MapData 객체생성
         MapData mapData = new MapData();
@@ -288,5 +313,12 @@ public class EditorManager : MonoBehaviour
         file.Close();
 
         Debug.Log("저장완료");
+
+        isSaved = true;
+    }
+
+    public void ChangedAnyData()
+    {
+        isSaved = false;
     }
 }

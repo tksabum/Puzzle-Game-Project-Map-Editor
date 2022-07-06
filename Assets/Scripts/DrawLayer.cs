@@ -101,6 +101,18 @@ public class DrawLayer : MonoBehaviour
         CloseBlockSettingWindow();
     }
 
+    public void InitBlocks()
+    {
+        for (int i = 0; i < mapWidth; i++)
+        {
+            for (int j = 0; j < mapHeight; j++)
+            {
+                floorBlocks[i][j].GetComponent<Block>().Clear();
+                itemBlocks[i][j].GetComponent<Block>().Clear();
+            }
+        }
+    }
+
     public void InitBlocks(MapData mapData)
     {
         Dictionary<string, Sprite> floorDic = new Dictionary<string, Sprite>();
@@ -176,6 +188,8 @@ public class DrawLayer : MonoBehaviour
             floorBlocks[provider.x][provider.y].GetComponent<Block>().AddTarget(target);
             floorBlocks[target.x][target.y].GetComponent<Block>().AddProvider(provider);
         }
+
+        RefreshHighLight();
     }
 
     public void Resize(int width, int height)
@@ -203,6 +217,8 @@ public class DrawLayer : MonoBehaviour
                 }
             }
         }
+
+        editorManager.ChangedAnyData();
     }
 
     public void ActiveFloorLayer()

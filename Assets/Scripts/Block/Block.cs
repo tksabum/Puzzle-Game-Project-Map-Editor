@@ -57,6 +57,7 @@ public class Block : MonoBehaviour
     {
         providers.Clear();
         targets.Clear();
+        PaintOver(DefaultSprite);
     }
 
     public Sprite GetSprite()
