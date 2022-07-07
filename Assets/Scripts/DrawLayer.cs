@@ -218,8 +218,6 @@ public class DrawLayer : MonoBehaviour
                 }
             }
         }
-
-        editorManager.ChangedAnyData();
     }
 
     public void ActiveFloorLayer()
@@ -294,6 +292,8 @@ public class DrawLayer : MonoBehaviour
                 itemBlocks[idx.x][idx.y].GetComponent<Block>().PaintOver(selectedSprite);
             }
         }
+
+        editorManager.ChangedAnyData();
     }
 
 
@@ -336,6 +336,8 @@ public class DrawLayer : MonoBehaviour
                 highlightBlocks[idx.x][idx.y].GetComponent<HighLightBlock>().SetColor(targetColor);
                 floorBlocks[idx.x][idx.y].GetComponent<Block>().AddProvider(currentSelectedIdx);
                 blockSettingWindow.Refresh(currentSelectedIdx, currentSelectedBlock);
+
+                editorManager.ChangedAnyData();
             }
             // 선택 취소
             else if (funcResult == -1)
@@ -343,6 +345,8 @@ public class DrawLayer : MonoBehaviour
                 highlightBlocks[idx.x][idx.y].GetComponent<HighLightBlock>().SetColor(emptyColor);
                 floorBlocks[idx.x][idx.y].GetComponent<Block>().RemoveProvider(currentSelectedIdx);
                 blockSettingWindow.Refresh(currentSelectedIdx, currentSelectedBlock);
+
+                editorManager.ChangedAnyData();
             }
             // 선택 불가
             else if (funcResult == 0) { }

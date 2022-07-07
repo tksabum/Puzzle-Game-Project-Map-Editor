@@ -11,6 +11,7 @@ public class SizeController : MonoBehaviour
     [Range(0, 99)]
     public int defaultHeight;
 
+    public EditorManager editorManager;
     public DrawLayer drawLayer;
     public GameObject controller;
 
@@ -32,7 +33,7 @@ public class SizeController : MonoBehaviour
 
     public void Init()
     {
-        Resize(defaultWidth, defaultHeight);
+        ResizeDefault();
     }
 
     public void Init(int x, int y)
@@ -59,12 +60,21 @@ public class SizeController : MonoBehaviour
     {
         textMapSize.text = currentMapSize.x + " X " + currentMapSize.y;
         drawLayer.Resize(currentMapSize.x, currentMapSize.y);
+        editorManager.ChangedAnyData();
     }
 
     void Resize(int x, int y)
     {
         currentMapSize.x = x;
         currentMapSize.y = y;
+        Resize();
+        editorManager.ChangedAnyData();
+    }
+
+    void ResizeDefault()
+    {
+        currentMapSize.x = defaultWidth;
+        currentMapSize.y = defaultHeight;
         Resize();
     }
 

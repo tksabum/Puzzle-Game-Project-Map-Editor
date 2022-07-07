@@ -298,7 +298,7 @@ public class Pallet : MonoBehaviour
         {
             foreach(Sprite sprite in itemBlockSet.sprites)
             {
-                if (itemName == sprite.name)
+                if (sprite != null && itemName == sprite.name)
                 {
                     return sprite;
                 }

@@ -9,6 +9,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 public class EditorManager : MonoBehaviour
 {
     [Header("- Core -")]
+    public SelectWindow selectWindow;
     public DrawLayer drawLayer;
     public Pallet pallet;
     public SizeController sizeController;
@@ -52,13 +53,27 @@ public class EditorManager : MonoBehaviour
         startLife = 1;
         maxLife = 1;
 
-        isSaved = false;
+        isSaved = true;
     }
 
     // Start is called before the first frame update
     void Start()
     {
         sizeController.Init();
+        drawLayer.Init();
+    }
+
+    void Init()
+    {
+        fileName = DefaultFileName;
+        filePath = defaultFolderPath + "/" + DefaultFileName + ".dat";
+        mapDesigner = "UnKnownDesigner";
+        startIdx = new Vector2Int(0, 0);
+        startLife = 1;
+        maxLife = 1;
+
+        sizeController.Init();
+        drawLayer.InitBlocks();
         drawLayer.Init();
     }
 
@@ -172,6 +187,7 @@ public class EditorManager : MonoBehaviour
     public void SetMapDesigner(string str)
     {
         mapDesigner = str;
+        ChangedAnyData();
     }
 
     public Vector2Int GetStartIdx()
@@ -182,6 +198,7 @@ public class EditorManager : MonoBehaviour
     public void SetStartIdx(Vector2Int idx)
     {
         startIdx = idx;
+        ChangedAnyData();
     }
 
     public int GetStartLife()
@@ -192,8 +209,9 @@ public class EditorManager : MonoBehaviour
     public void SetStartLife(int _startLife)
     {
         startLife = _startLife;
+        ChangedAnyData();
     }
-
+    
     public int GetMaxLife()
     {
         return maxLife;
@@ -202,20 +220,19 @@ public class EditorManager : MonoBehaviour
     public void SetMaxLife(int _maxLife)
     {
         maxLife = _maxLife;
+        ChangedAnyData();
     }
 
     public void ButtonNew()
     {
-        fileName = DefaultFileName;
-        filePath = defaultFolderPath + "/" + DefaultFileName + ".dat";
-        mapDesigner = "UnKnownDesigner";
-        startIdx = new Vector2Int(0, 0);
-        startLife = 1;
-        maxLife = 1;
-
-        sizeController.Init();
-        drawLayer.InitBlocks();
-        drawLayer.Init();
+        if (isSaved)
+        {
+            Init();
+        }
+        else
+        {
+            selectWindow.OpenSelectWindow(Init, null, true, "Not saved. Would you like to continue?", "New", "Cancel");
+        }
     }
 
     public void ButtonOpen()
@@ -233,23 +250,35 @@ public class EditorManager : MonoBehaviour
         }
         else
         {
-            SaveAs(filePath);
+            SaveAs(filePath, true);
         }
     }
 
     public void ButtonSaveAs()
     {
-        FileBrowser.ShowSaveDialog((paths) => { SaveAs(paths[0] + ".dat"); },
+        FileBrowser.ShowSaveDialog((paths) => { SaveAs(paths[0] + ".dat", false); },
                                    () => { },
                                    FileBrowser.PickMode.Files, false, defaultFolderPath, null, "Save As", "Save");
     }
 
-    public void ButtonQuit()
+    void QuitEditor()
     {
         #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
         #endif
         Application.Quit();
+    }
+
+    public void ButtonQuit()
+    {
+        if (isSaved)
+        {
+            QuitEditor();
+        }
+        else
+        {
+            selectWindow.OpenSelectWindow(QuitEditor, null, true, "Not saved. Would you like to continue?", "Quit", "Cancel");
+        }
     }
 
     void Load(string path)
@@ -273,6 +302,8 @@ public class EditorManager : MonoBehaviour
             maxLife = mapData.maxLife;
             sizeController.Init(mapData.mapWidth, mapData.mapHeight);
             drawLayer.InitBlocks(mapData);
+
+            isSaved = true;
         }
         else
         {
@@ -280,12 +311,13 @@ public class EditorManager : MonoBehaviour
         }
     }
 
-    void SaveAs(string path)
+    void SaveAs(string path, bool isResave)
     {
-        //if (File.Exists(path))
-        //{
-        //    throw new System.Exception("이미 존재함");
-        //}
+        if (!isResave && File.Exists(path))
+        {
+            selectWindow.OpenSelectWindow(null, null, false, "The file name already exists", "OK", "");
+            return;
+        }
 
         int lastindexofslash = path.LastIndexOf('/');
         fileName = path.Substring(lastindexofslash + 1, path.Length - (lastindexofslash + 1));
