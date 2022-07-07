@@ -10,8 +10,10 @@ public class EditorManager : MonoBehaviour
 {
     [Header("- Core -")]
     public DrawLayer drawLayer;
+    public Pallet pallet;
     public SizeController sizeController;
     public Setting setting;
+    public List<ShortCutKeySet> shortCutKeySets;
 
     [Header("- Camera -")]
     public float zoomSpeed;
@@ -106,6 +108,60 @@ public class EditorManager : MonoBehaviour
             Camera.main.transform.position -= Camera.main.ScreenToWorldPoint(Input.mousePosition) - lastMousePos;
             lastMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
+
+        // 단축키
+        // 등록
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) SetShortCut(1);
+            if (Input.GetKeyDown(KeyCode.Alpha2)) SetShortCut(2);
+            if (Input.GetKeyDown(KeyCode.Alpha3)) SetShortCut(3);
+            if (Input.GetKeyDown(KeyCode.Alpha4)) SetShortCut(4);
+            if (Input.GetKeyDown(KeyCode.Alpha5)) SetShortCut(5);
+            if (Input.GetKeyDown(KeyCode.Alpha6)) SetShortCut(6);
+            if (Input.GetKeyDown(KeyCode.Alpha7)) SetShortCut(7);
+            if (Input.GetKeyDown(KeyCode.Alpha8)) SetShortCut(8);
+            if (Input.GetKeyDown(KeyCode.Alpha9)) SetShortCut(9);
+            if (Input.GetKeyDown(KeyCode.Alpha0)) SetShortCut(0);
+        }
+        //사용
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) UseShortCut(1);
+            if (Input.GetKeyDown(KeyCode.Alpha2)) UseShortCut(2);
+            if (Input.GetKeyDown(KeyCode.Alpha3)) UseShortCut(3);
+            if (Input.GetKeyDown(KeyCode.Alpha4)) UseShortCut(4);
+            if (Input.GetKeyDown(KeyCode.Alpha5)) UseShortCut(5);
+            if (Input.GetKeyDown(KeyCode.Alpha6)) UseShortCut(6);
+            if (Input.GetKeyDown(KeyCode.Alpha7)) UseShortCut(7);
+            if (Input.GetKeyDown(KeyCode.Alpha8)) UseShortCut(8);
+            if (Input.GetKeyDown(KeyCode.Alpha9)) UseShortCut(9);
+            if (Input.GetKeyDown(KeyCode.Alpha0)) UseShortCut(0);
+        }
+
+    }
+
+    void SetShortCut(int keyNum)
+    {
+        BlockType blockType = pallet.GetSelectedBlockType();
+        Sprite sprite = pallet.GetSelectedSprite();
+
+        if (sprite != null)
+        {
+            shortCutKeySets[keyNum].SetShortCut(blockType, sprite);
+        }
+    }
+
+    void UseShortCut(int keyNum)
+    {
+        BlockType blockType = shortCutKeySets[keyNum].GetBlockType();
+        Sprite sprite = shortCutKeySets[keyNum].GetSprite();
+
+        if (sprite != null)
+        {
+            pallet.SelectBlock(sprite, blockType);
+            drawLayer.Paint();
+        }
     }
 
     public string GetMapDesigner()
@@ -186,6 +242,14 @@ public class EditorManager : MonoBehaviour
         FileBrowser.ShowSaveDialog((paths) => { SaveAs(paths[0] + ".dat"); },
                                    () => { },
                                    FileBrowser.PickMode.Files, false, defaultFolderPath, null, "Save As", "Save");
+    }
+
+    public void ButtonQuit()
+    {
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #endif
+        Application.Quit();
     }
 
     void Load(string path)

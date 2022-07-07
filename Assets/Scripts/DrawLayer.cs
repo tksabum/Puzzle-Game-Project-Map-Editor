@@ -45,6 +45,8 @@ public class DrawLayer : MonoBehaviour
     HighLightBlock.Color providerColor = HighLightBlock.Color.GREEN;
     HighLightBlock.Color targetColor = HighLightBlock.Color.BLUE;
 
+    bool isMouseEntered = false;
+    Vector2Int mouseLastEnteredIdx;
 
     private void Awake()
     {
@@ -97,7 +99,6 @@ public class DrawLayer : MonoBehaviour
 
     public void Init()
     {
-        isOpenedBlockSetting = false;
         CloseBlockSettingWindow();
     }
 
@@ -298,6 +299,9 @@ public class DrawLayer : MonoBehaviour
 
     public void TriggerMouseEnter(Vector2Int idx)
     {
+        isMouseEntered = true;
+        mouseLastEnteredIdx = idx;
+
         if (!isOpenedBlockSetting)
         {
             Paint(idx);
@@ -306,6 +310,8 @@ public class DrawLayer : MonoBehaviour
 
     public void TriggerMouseExit(Vector2Int idx)
     {
+        isMouseEntered = false;
+
         floorBlocks[idx.x][idx.y].GetComponent<Block>().Erase();
         itemBlocks[idx.x][idx.y].GetComponent<Block>().Erase();
     }
@@ -465,5 +471,13 @@ public class DrawLayer : MonoBehaviour
     public Block GetFloorBlock(int x, int y)
     {
         return floorBlocks[x][y].GetComponent<Block>();
+    }
+
+    public void Paint()
+    {
+        if (isMouseEntered)
+        {
+            Paint(mouseLastEnteredIdx);
+        }
     }
 }
