@@ -32,6 +32,8 @@ public class DrawLayer : MonoBehaviour
     List<List<GameObject>> triggerBlocks;
     List<List<GameObject>> highlightBlocks;
 
+    HashSet<Vector2Int> autoTrapSet;
+
     int mapWidth;
     int mapHeight;
 
@@ -104,6 +106,8 @@ public class DrawLayer : MonoBehaviour
 
     public void InitBlocks()
     {
+        autoTrapSet = new HashSet<Vector2Int>();
+
         for (int i = 0; i < mapWidth; i++)
         {
             for (int j = 0; j < mapHeight; j++)
@@ -188,6 +192,18 @@ public class DrawLayer : MonoBehaviour
 
             floorBlocks[provider.x][provider.y].GetComponent<Block>().AddTarget(target);
             floorBlocks[target.x][target.y].GetComponent<Block>().AddProvider(provider);
+        }
+
+        autoTrapSet = new HashSet<Vector2Int>();
+
+        foreach (KeyValuePair<PairInt, ThreeInt> keyValuePair in mapData.trapData)
+        {
+            PairInt key = keyValuePair.Key;
+            ThreeInt value = keyValuePair.Value;
+
+            autoTrapSet.Add(new Vector2Int(key.x, key.y));
+
+            floorBlocks[key.x][key.y].GetComponent<Block>().SetTrapDelay(value);
         }
 
         RefreshHighLight();
@@ -475,6 +491,11 @@ public class DrawLayer : MonoBehaviour
     public Block GetFloorBlock(int x, int y)
     {
         return floorBlocks[x][y].GetComponent<Block>();
+    }
+
+    public HashSet<Vector2Int> GetAutoTrapSet()
+    {
+        return autoTrapSet;
     }
 
     public void Paint()

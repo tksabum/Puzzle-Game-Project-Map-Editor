@@ -13,6 +13,10 @@ public class Block : MonoBehaviour
     HashSet<Vector2Int> providers;
     HashSet<Vector2Int> targets;
 
+    int firstDelay;
+    int oddDelay;
+    int evenDelay;
+
     Vector2Int idx;
 
     private void Awake()
@@ -22,6 +26,27 @@ public class Block : MonoBehaviour
 
         providers = new HashSet<Vector2Int>();
         targets = new HashSet<Vector2Int>();
+
+        firstDelay = 0;
+        oddDelay = 0;
+        evenDelay = 0;
+    }
+
+    public void SetTrapDelay(int firstdelay, int odddelay, int evendelay)
+    {
+        firstDelay = firstdelay;
+        oddDelay = odddelay;
+        evenDelay = evendelay;
+    }
+
+    public void SetTrapDelay(ThreeInt threeInt)
+    {
+        SetTrapDelay(threeInt.x, threeInt.y, threeInt.z);
+    }
+
+    public ThreeInt GetTrapDelay()
+    {
+        return new ThreeInt(firstDelay, oddDelay, evenDelay);
     }
 
     public void SetIdx(Vector2Int _idx)

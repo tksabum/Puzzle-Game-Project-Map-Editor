@@ -402,6 +402,14 @@ public class EditorManager : MonoBehaviour
             }
         }
 
+        mapData.trapData = new Dictionary<PairInt, ThreeInt>();
+
+        HashSet<Vector2Int> trapset = drawLayer.GetAutoTrapSet();
+        foreach(Vector2Int trapidx in trapset)
+        {
+            mapData.trapData.Add(new PairInt(trapidx.x, trapidx.y), drawLayer.GetFloorBlock(trapidx.x, trapidx.y).GetTrapDelay());
+        }
+
         BinaryFormatter binaryFormatter = new BinaryFormatter();
         FileStream file = File.Create(path);
 

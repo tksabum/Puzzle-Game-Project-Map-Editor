@@ -16,6 +16,21 @@ public class PairInt
 }
 
 [System.Serializable]
+public class ThreeInt
+{
+    public int x;
+    public int y;
+    public int z;
+
+    public ThreeInt(int _x, int _y, int _z)
+    {
+        x = _x;
+        y = _y;
+        z = _z;
+    }
+}
+
+[System.Serializable]
 public class MapData
 {
     public string appVersion;
@@ -29,4 +44,5 @@ public class MapData
     public List<List<string>> itemData;
     public Dictionary<PairInt, List<PairInt>> powerData;
     public Dictionary<PairInt, PairInt> portalData;
+    public Dictionary<PairInt, ThreeInt> trapData;
 }
