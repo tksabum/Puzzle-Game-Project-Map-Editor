@@ -387,14 +387,14 @@ public class DrawLayer : MonoBehaviour
         }
         targets.Clear();
         blockSettingWindow.Refresh(currentSelectedIdx, currentSelectedBlock);
-        RefreshHighLightSettingMode();
+        RefreshHighLight();
     }
 
     public void RefreshHighLight()
     {
         if (isOpenedBlockSetting)
         {
-            RefreshHighLightSettingMode();
+            HighLightSettingMode();
         }
         else
         {
@@ -402,7 +402,7 @@ public class DrawLayer : MonoBehaviour
         }
     }
 
-    void RefreshHighLightSettingMode()
+    void HighLightSettingMode()
     {
         for (int i = 0; i < mapWidth; i++)
         {
@@ -424,11 +424,6 @@ public class DrawLayer : MonoBehaviour
         {
             highlightBlocks[target.x][target.y].GetComponent<HighLightBlock>().SetColor(targetColor);
         }
-    }
-
-    void HighLightSettingMode()
-    {
-        RefreshHighLightSettingMode();
 
         highlightLayer.SetActive(true);
     }

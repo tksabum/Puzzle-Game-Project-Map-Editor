@@ -38,6 +38,8 @@ public class EditorManager : MonoBehaviour
     int maxLife;
 
     bool isSaved;
+    bool isPauseCamera;
+    bool isPauseShortCut;
 
     private void Awake()
     {
@@ -54,6 +56,8 @@ public class EditorManager : MonoBehaviour
         maxLife = 1;
 
         isSaved = true;
+        isPauseCamera = false;
+        isPauseShortCut = false;
     }
 
     // Start is called before the first frame update
@@ -79,6 +83,19 @@ public class EditorManager : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+        if (!isPauseCamera)
+        {
+            UpdateCamera();
+        }
+
+        if (!isPauseShortCut)
+        {
+            UpdateShortCut();
+        }
+    }
+
+    void UpdateCamera()
     {
         // 카메라 이동(키)
         float inputHorizontal = Input.GetAxisRaw("Horizontal");
@@ -123,7 +140,10 @@ public class EditorManager : MonoBehaviour
             Camera.main.transform.position -= Camera.main.ScreenToWorldPoint(Input.mousePosition) - lastMousePos;
             lastMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
+    }
 
+    void UpdateShortCut()
+    {
         // 단축키
         // 등록
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
@@ -153,7 +173,6 @@ public class EditorManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha9)) UseShortCut(9);
             if (Input.GetKeyDown(KeyCode.Alpha0)) UseShortCut(0);
         }
-
     }
 
     void SetShortCut(int keyNum)
@@ -177,6 +196,26 @@ public class EditorManager : MonoBehaviour
             pallet.SelectBlock(sprite, blockType);
             drawLayer.Paint();
         }
+    }
+
+    public void PauseCamera()
+    {
+        isPauseCamera = true;
+    }
+
+    public void ResumeCamera()
+    {
+        isPauseCamera = false;
+    }
+
+    public void PauseShortCut()
+    {
+        isPauseShortCut = true;
+    }
+
+    public void ResumeShortCut()
+    {
+        isPauseShortCut = false;
     }
 
     public string GetMapDesigner()

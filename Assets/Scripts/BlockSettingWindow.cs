@@ -10,6 +10,8 @@ public class BlockSettingWindow : MonoBehaviour
     public TMP_Text textBlockIdx;
     public TMP_Text textNumberOfTarget;
 
+    public GameObject trapInfo;
+
     public GameObject textEmpty;
     public List<TMP_Text> textTargets;
 
@@ -22,6 +24,7 @@ public class BlockSettingWindow : MonoBehaviour
         currentIdx = Vector2Int.zero;
     }
 
+    // 이미 같은 index의 창이 열려있다면 false리턴
     public bool Open(Vector2Int selectedIdx, Block selectedBlock)
     {
         if (isOpened && currentIdx == selectedIdx)
@@ -93,6 +96,18 @@ public class BlockSettingWindow : MonoBehaviour
         {
             textNumberOfTarget.text = "(0 / 0)";
         }
+
+        // trap info
+        if (spriteName.Contains("Trap_"))
+        {
+            trapInfo.SetActive(true);
+            // 추가 필요
+        }
+        else
+        {
+            trapInfo.SetActive(false);
+        }
+
 
         LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
     }
