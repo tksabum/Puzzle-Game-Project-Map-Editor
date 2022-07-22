@@ -28,6 +28,40 @@ public class ThreeInt
         y = _y;
         z = _z;
     }
+
+    public override bool Equals(object o)
+    {
+        if ((ThreeInt)o == this)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public static bool operator ==(ThreeInt a, ThreeInt b)
+    {
+        if (a.x == b.x && a.y == b.y && a.z == b.z)
+        {
+            return true;
+        }
+
+        return false;
+    }  
+    public static bool operator !=(ThreeInt a, ThreeInt b)
+    {
+        if (a.x == b.x && a.y == b.y && a.z == b.z)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }
 
 [System.Serializable]

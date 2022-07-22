@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using CustomClass;
 
 public class DrawLayer : MonoBehaviour
 {
@@ -50,6 +51,9 @@ public class DrawLayer : MonoBehaviour
     bool isMouseEntered = false;
     Vector2Int mouseLastEnteredIdx;
 
+    DisjointSet<Vector2Int> trapGroup;
+    DisjointSet<Vector2Int> selectedTrap;
+
     private void Awake()
     {
         floorBlocks = new List<List<GameObject>>();
@@ -97,6 +101,8 @@ public class DrawLayer : MonoBehaviour
                 highlightBlocks[i].Add(Instantiate(highlightBlock, new Vector3(i, j, 0), Quaternion.identity, highlightLayer.transform));
             }
         }
+
+        trapGroup = new DisjointSet<Vector2Int>();
     }
 
     public void Init()
@@ -107,6 +113,7 @@ public class DrawLayer : MonoBehaviour
     public void InitBlocks()
     {
         autoTrapSet = new HashSet<Vector2Int>();
+        trapGroup = new DisjointSet<Vector2Int>();
 
         for (int i = 0; i < mapWidth; i++)
         {
@@ -206,6 +213,32 @@ public class DrawLayer : MonoBehaviour
             floorBlocks[key.x][key.y].GetComponent<Block>().SetTrapDelay(value);
         }
 
+        trapGroup = new DisjointSet<Vector2Int>();
+        Dictionary<KeyValuePair<bool, ThreeInt>, Vector2Int> dic = new Dictionary<KeyValuePair<bool, ThreeInt>, Vector2Int>();
+        for (int i = 0; i < mapWidth; i++)
+        {
+            for (int j = 0; j < mapHeight; j++)
+            {
+                Block block = floorBlocks[i][j].GetComponent<Block>();
+
+                if (block.GetSprite().name.Contains("Trap_"))
+                {
+                    trapGroup.AddElement(new Vector2Int(i, j));
+
+                    ThreeInt trapdelay = floorBlocks[i][j].GetComponent<Block>().GetTrapDelay();
+                    bool iscontain = autoTrapSet.Contains(new Vector2Int(i, j));
+                    if (dic.ContainsKey(new KeyValuePair<bool, ThreeInt>(iscontain, trapdelay)))
+                    {
+                        trapGroup.Union(dic[new KeyValuePair<bool, ThreeInt>(iscontain, trapdelay)], new Vector2Int(i, j));
+                    }
+                    else
+                    {
+                        dic.Add(new KeyValuePair<bool, ThreeInt>(iscontain, trapdelay), new Vector2Int(i, j));
+                    }
+                }
+            }
+        }
+
         RefreshHighLight();
     }
 
@@ -280,9 +313,31 @@ public class DrawLayer : MonoBehaviour
                 Block block = floorBlocks[idx.x][idx.y].GetComponent<Block>();
                 bool isOver = block.PaintOver(selectedSprite);
                 
-                // block의 targets, providers 초기화
+                // 이전과 다른 sprite로 변경된 경우
                 if (isOver)
                 {
+                    //trap관련 데이터 변경
+                    if (selectedSprite.name.Contains("Trap"))
+                    {
+                        if (!trapGroup.ContainsKey(idx))
+                        {
+                            trapGroup.AddElement(idx);
+                        }
+                    }
+                    else
+                    {
+                        if (trapGroup.ContainsKey(idx))
+                        {
+                            trapGroup.RemoveElement(idx);
+                        }
+
+                        if (autoTrapSet.Contains(idx))
+                        {
+                            autoTrapSet.Remove(idx);
+                        }
+                    }
+
+                    // block의 targets, providers 초기화
                     HashSet<Vector2Int> targets = block.GetTargets();
                     HashSet<Vector2Int> providers = block.GetProviders();
 
