@@ -106,6 +106,7 @@ public class DrawLayer : MonoBehaviour
             }
         }
 
+        autoTrapSet = new HashSet<Vector2Int>();
         trapGroup = new DisjointSet<Vector2Int>();
     }
 
@@ -321,7 +322,7 @@ public class DrawLayer : MonoBehaviour
                 if (isOver)
                 {
                     //trap관련 데이터 변경
-                    if (selectedSprite.name.Contains("Trap"))
+                    if (selectedSprite.name.Contains("Trap_"))
                     {
                         if (!trapGroup.ContainsKey(idx))
                         {
@@ -480,6 +481,9 @@ public class DrawLayer : MonoBehaviour
                     // 이전에 속해있던 그룹에서 제거하고 현재 선택된 그룹에 추가
                     selectedTrap.SplitElement(idx);
                     selectedTrap.Union(currentSelectedIdx, idx);
+
+                    // BlockSettingWindow 새로고침
+                    blockSettingWindow.RefreshTrap(idx, floorBlocks[idx.x][idx.y].GetComponent<Block>(), autoTrapSet.Contains(idx));
                 }
                 RefreshHighLight();
             }
@@ -597,7 +601,7 @@ public class DrawLayer : MonoBehaviour
     {
         currentSelectedBlock = floorBlocks[selectedIdx.x][selectedIdx.y].GetComponent<Block>();
         currentSelectedIdx = selectedIdx;
-        isOpenedBlockSetting = blockSettingWindow.Open(selectedIdx, currentSelectedBlock);
+        isOpenedBlockSetting = blockSettingWindow.Open(selectedIdx, currentSelectedBlock, autoTrapSet.Contains(selectedIdx));
         if (isOpenedBlockSetting)
         {
             selectedTrap = trapGroup.Copy();
@@ -645,6 +649,46 @@ public class DrawLayer : MonoBehaviour
         if (isMouseEntered)
         {
             Paint(mouseLastEnteredIdx);
+        }
+    }
+
+    public void SetAutoTrap(bool isAutoTrap)
+    {
+        if (!isOpenedBlockSetting)
+        {
+            return;
+        }
+
+        List<Vector2Int> list = selectedTrap.GetAllElementsList(currentSelectedIdx);
+        if (isAutoTrap)
+        {
+            foreach (Vector2Int trap in list)
+            {
+                autoTrapSet.Add(trap);
+            }
+        }
+        else
+        {
+            foreach (Vector2Int trap in list)
+            {
+                if (autoTrapSet.Contains(trap))
+                {
+                    autoTrapSet.Remove(trap);
+                }
+            }
+        }
+
+        trapGroup = selectedTrap.Copy();
+
+        RefreshHighLight();
+    }
+
+    public void SetDelay(int firstdelay, int odddelay, int evendelay)
+    {
+        List<Vector2Int> list = selectedTrap.GetAllElementsList(currentSelectedIdx);
+        for (int i = 0; i < list.Count; i++)
+        {
+            floorBlocks[list[i].x][list[i].y].GetComponent<Block>().SetTrapDelay(firstdelay, odddelay, evendelay);
         }
     }
 }

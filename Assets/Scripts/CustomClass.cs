@@ -112,6 +112,7 @@ namespace CustomClass
             return dict.ContainsKey(key);
         }
 
+        // elementOfSet과 같은 집합의 원소를 모두 List에 넣어 리턴
         public List<T> GetAllElementsList(T elementOfSet)
         {
             List<T> list = new List<T>();
@@ -134,6 +135,7 @@ namespace CustomClass
             return list;
         }
 
+        // elementOfSet과 같은 집합의 원소를 모두 Hash에 넣어 리턴
         public HashSet<T> GetAllElementsHash(T elementOfSet)
         {
             HashSet<T> hash = new HashSet<T>();
@@ -295,6 +297,18 @@ namespace CustomClass
                 rank.RemoveAt(elementNum);
                 dict.Remove(element);
             }
+        }
+
+        public override string ToString()
+        {
+            string str = "[count: " + values.Count + "] ";
+
+            foreach (T value in values)
+            {
+                str += "[" + value + "] ";
+            }
+
+            return str;
         }
     }
 }
