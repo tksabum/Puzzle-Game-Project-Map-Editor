@@ -48,6 +48,10 @@ public class DrawLayer : MonoBehaviour
     HighLightBlock.Color providerColor = HighLightBlock.Color.GREEN;
     HighLightBlock.Color targetColor = HighLightBlock.Color.BLUE;
 
+    HighLightBlock.Color mainTrapColor = HighLightBlock.Color.GREEN;
+    HighLightBlock.Color sameGroupColor = HighLightBlock.Color.YELLOW;
+    HighLightBlock.Color differentGroupColor = HighLightBlock.Color.BLUE;
+
     bool isMouseEntered = false;
     Vector2Int mouseLastEnteredIdx;
 
@@ -429,7 +433,60 @@ public class DrawLayer : MonoBehaviour
         bool isFloorActive = floorLayer.activeInHierarchy;
         if (true == isFloorActive)
         {
+            if (isOpenedBlockSetting && currentSelectedBlock != null && currentSelectedBlock.GetSprite().name.Contains("Trap_"))
+            {
+                TrapRightClickEvent(idx);
+            }
+            else
+            {
+                OpenBlockSettingWindow(idx);
+            }
+        }
+    }
+
+    // Trap이 선택된 상태로 우클릭한 경우
+    void TrapRightClickEvent(Vector2Int idx)
+    {
+        // 선택된 메인블록을 다시 클릭한 경우
+        if (currentSelectedIdx == idx)
+        {
             OpenBlockSettingWindow(idx);
+        }
+        else
+        {
+            Block block = floorBlocks[idx.x][idx.y].GetComponent<Block>();
+
+            // Trap을 클릭한 경우
+            if (block.GetSprite().name.Contains("Trap_"))
+            {
+                // 선택되어 있는 경우
+                if (selectedTrap.GroupCheck(currentSelectedIdx, idx))
+                {
+                    // 원래 같은 그룹인 경우
+                    if (trapGroup.GroupCheck(currentSelectedIdx, idx))
+                    {
+                        // 새로운 그룹으로 분리
+                        selectedTrap.SplitElement(idx);
+                    }
+                    else
+                    {
+                        // 원래 속한 그룹으로 이동
+                        selectedTrap.SplitElement(idx, trapGroup.GetRoot(idx));
+                    }
+                }
+                // 선택되어 있지 않은 경우
+                else
+                {
+                    // 이전에 속해있던 그룹에서 제거하고 현재 선택된 그룹에 추가
+                    selectedTrap.SplitElement(idx);
+                    selectedTrap.Union(currentSelectedIdx, idx);
+                }
+                RefreshHighLight();
+            }
+            else
+            {
+                // Trap이 아닌 블록을 클릭한 경우 반응하지 않음
+            }
         }
     }
 
@@ -459,25 +516,58 @@ public class DrawLayer : MonoBehaviour
 
     void HighLightSettingMode()
     {
-        for (int i = 0; i < mapWidth; i++)
+        // 선택된 블록이 Trap인 경우
+        if (currentSelectedBlock.GetSprite().name.Contains("Trap_"))
         {
-            for (int j = 0; j < mapHeight; j++)
+            for (int i = 0; i < mapWidth; i++)
             {
-                if (i == currentSelectedIdx.x && j == currentSelectedIdx.y)
+                for (int j = 0; j < mapHeight; j++)
                 {
-                    highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(providerColor);
-                }
-                else
-                {
-                    highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(HighLightBlock.Color.EMPTY);
+                    if (i == currentSelectedIdx.x && j == currentSelectedIdx.y)
+                    {
+                        highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(mainTrapColor);
+                    }
+                    else if (floorBlocks[i][j].GetComponent<Block>().GetSprite().name.Contains("Trap_") && selectedTrap.GroupCheck(currentSelectedIdx, new Vector2Int(i, j)))
+                    {
+                        if (trapGroup.GroupCheck(currentSelectedIdx, new Vector2Int(i, j)))
+                        {
+                            highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(sameGroupColor);
+                        }
+                        else
+                        {
+                            highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(differentGroupColor);
+                        }
+                    }
+                    else
+                    {
+                        highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(HighLightBlock.Color.EMPTY);
+                    }
                 }
             }
         }
-
-        HashSet<Vector2Int> targets = currentSelectedBlock.GetTargets();
-        foreach (Vector2Int target in targets)
+        // 선택된 블록이 Trap이 아닌 경우
+        else
         {
-            highlightBlocks[target.x][target.y].GetComponent<HighLightBlock>().SetColor(targetColor);
+            for (int i = 0; i < mapWidth; i++)
+            {
+                for (int j = 0; j < mapHeight; j++)
+                {
+                    if (i == currentSelectedIdx.x && j == currentSelectedIdx.y)
+                    {
+                        highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(providerColor);
+                    }
+                    else
+                    {
+                        highlightBlocks[i][j].GetComponent<HighLightBlock>().SetColor(HighLightBlock.Color.EMPTY);
+                    }
+                }
+            }
+
+            HashSet<Vector2Int> targets = currentSelectedBlock.GetTargets();
+            foreach (Vector2Int target in targets)
+            {
+                highlightBlocks[target.x][target.y].GetComponent<HighLightBlock>().SetColor(targetColor);
+            }
         }
 
         highlightLayer.SetActive(true);
@@ -510,6 +600,8 @@ public class DrawLayer : MonoBehaviour
         isOpenedBlockSetting = blockSettingWindow.Open(selectedIdx, currentSelectedBlock);
         if (isOpenedBlockSetting)
         {
+            selectedTrap = trapGroup.Copy();
+
             floorBlocks[selectedIdx.x][selectedIdx.y].GetComponent<Block>().Erase();
             itemBlocks[selectedIdx.x][selectedIdx.y].GetComponent<Block>().Erase();
             HighLightSettingMode();

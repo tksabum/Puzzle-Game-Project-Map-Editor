@@ -35,6 +35,28 @@ namespace CustomClass
             }
         }
 
+        public DisjointSet<T> Copy()
+        {
+            DisjointSet<T> clone = new DisjointSet<T>();
+            for (int i = 0; i < parent.Count; i++)
+            {
+                clone.parent.Add(parent[i]);
+                clone.values.Add(values[i]);
+                clone.rank.Add(rank[i]);
+            }
+            foreach(KeyValuePair<T, int> kvp in dict)
+            {
+                clone.dict.Add(kvp.Key, kvp.Value);
+            }
+
+            return clone;
+        }
+
+        public T GetRoot(T key)
+        {
+            return values[Find(dict[key])];
+        }
+
         public int Find(int u)
         {
             if (parent[u] == u)
@@ -72,6 +94,17 @@ namespace CustomClass
                 throw new System.Exception("Error: Union(T u, T v)");
             }
             Union(dict[u], dict[v]);
+        }
+
+        // u, v가 같은 집합에 속하면 true, 아니면 false
+        public bool GroupCheck(T u, T v)
+        {
+            if (Find(dict[u]) == Find(dict[v]))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public bool ContainsKey(T key)
@@ -126,7 +159,58 @@ namespace CustomClass
         // 하나의 원소를 원래의 집합에서 제거하고 root노드가 되게 함
         public void SplitElement(T element)
         {
-            // not implement
+            int elementNum = dict[element];
+            int root = Find(elementNum);
+
+            for (int i = 0; i < parent.Count; i++)
+            {
+                Find(i);
+                if (parent[i] != i)
+                {
+                    rank[parent[i]] = 2;
+                }
+            }
+
+            if (root == elementNum)
+            {
+                int newRoot = -1;
+
+                for (int i = 0; i < parent.Count; i++)
+                {
+                    if (i == elementNum) continue;
+
+                    if (parent[i] == elementNum)
+                    {
+                        if (newRoot == -1)
+                        {
+                            parent[i] = i;
+                            newRoot = i;
+                            rank[i] = 1;
+                        }
+                        else
+                        {
+                            parent[i] = newRoot;
+                            rank[newRoot] = 2;
+                        }
+                    }
+                }
+
+                parent[elementNum] = elementNum;
+                rank[elementNum] = 1;
+            }
+            else
+            {
+                parent[elementNum] = elementNum;
+                rank[elementNum] = 1;
+            }
+
+        }
+
+        // 하나의 원소를 원래의 집합에서 제거하고 root의 집합에 포함시킨다.
+        public void SplitElement(T element, T root)
+        {
+            SplitElement(element);
+            Union(element, root);
         }
 
         // 여러개의 원소를 원래의 집합에서 제거하고 그것들이 새로운 집합을 이루게 함
@@ -182,7 +266,9 @@ namespace CustomClass
 
                 for(int i = 0; i < parent.Count; i++)
                 {
-                    if (parent[i] != elementNum)
+                    if (i == elementNum) continue;
+
+                    if (parent[i] == elementNum)
                     {
                         if (newRoot == -1)
                         {
