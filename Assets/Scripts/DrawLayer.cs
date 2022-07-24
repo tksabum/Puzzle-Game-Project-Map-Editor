@@ -208,18 +208,21 @@ public class DrawLayer : MonoBehaviour
 
         autoTrapSet = new HashSet<Vector2Int>();
 
-        foreach (KeyValuePair<PairInt, ThreeInt> keyValuePair in mapData.trapData)
+        if (mapData.trapData != null)
         {
-            PairInt key = keyValuePair.Key;
-            ThreeInt value = keyValuePair.Value;
+            foreach (KeyValuePair<PairInt, ThreeInt> keyValuePair in mapData.trapData)
+            {
+                PairInt key = keyValuePair.Key;
+                ThreeInt value = keyValuePair.Value;
 
-            autoTrapSet.Add(new Vector2Int(key.x, key.y));
+                autoTrapSet.Add(new Vector2Int(key.x, key.y));
 
-            floorBlocks[key.x][key.y].GetComponent<Block>().SetTrapDelay(value);
+                floorBlocks[key.x][key.y].GetComponent<Block>().SetTrapDelay(value);
+            }
         }
 
         trapGroup = new DisjointSet<Vector2Int>();
-        Dictionary<KeyValuePair<bool, ThreeInt>, Vector2Int> dic = new Dictionary<KeyValuePair<bool, ThreeInt>, Vector2Int>();
+        Dictionary<KeyValuePair<bool, Vector3Int>, Vector2Int> dic = new Dictionary<KeyValuePair<bool, Vector3Int>, Vector2Int>();
         for (int i = 0; i < mapWidth; i++)
         {
             for (int j = 0; j < mapHeight; j++)
@@ -230,15 +233,16 @@ public class DrawLayer : MonoBehaviour
                 {
                     trapGroup.AddElement(new Vector2Int(i, j));
 
-                    ThreeInt trapdelay = floorBlocks[i][j].GetComponent<Block>().GetTrapDelay();
+                    ThreeInt trapdelayThreeInt = floorBlocks[i][j].GetComponent<Block>().GetTrapDelay();
+                    Vector3Int trapdelay = new Vector3Int(trapdelayThreeInt.x, trapdelayThreeInt.y, trapdelayThreeInt.z);
                     bool iscontain = autoTrapSet.Contains(new Vector2Int(i, j));
-                    if (dic.ContainsKey(new KeyValuePair<bool, ThreeInt>(iscontain, trapdelay)))
+                    if (dic.ContainsKey(new KeyValuePair<bool, Vector3Int>(iscontain, trapdelay)))
                     {
-                        trapGroup.Union(dic[new KeyValuePair<bool, ThreeInt>(iscontain, trapdelay)], new Vector2Int(i, j));
+                        trapGroup.Union(dic[new KeyValuePair<bool, Vector3Int>(iscontain, trapdelay)], new Vector2Int(i, j));
                     }
                     else
                     {
-                        dic.Add(new KeyValuePair<bool, ThreeInt>(iscontain, trapdelay), new Vector2Int(i, j));
+                        dic.Add(new KeyValuePair<bool, Vector3Int>(iscontain, trapdelay), new Vector2Int(i, j));
                     }
                 }
             }
@@ -372,7 +376,6 @@ public class DrawLayer : MonoBehaviour
         editorManager.ChangedAnyData();
     }
 
-
     public void TriggerMouseEnter(Vector2Int idx)
     {
         isMouseEntered = true;
@@ -404,6 +407,12 @@ public class DrawLayer : MonoBehaviour
     {
         if (isOpenedBlockSetting)
         {
+            if (currentSelectedBlock.GetSprite().name.Contains("Trap_"))
+            {
+                TrapLeftClickEvent(idx);
+            }
+
+            // target 추가 button, portal에만 추가됨
             int funcResult = currentSelectedBlock.AddTarget(idx);
 
             // 선택
@@ -441,6 +450,58 @@ public class DrawLayer : MonoBehaviour
             else
             {
                 OpenBlockSettingWindow(idx);
+            }
+        }
+    }
+
+    void TrapLeftClickEvent(Vector2Int idx)
+    {
+        // 선택된 메인블록을 다시 클릭한 경우
+        if (currentSelectedIdx == idx)
+        {
+            // 아무런 반응을 하지않음
+        }
+        else
+        {
+            Block block = floorBlocks[idx.x][idx.y].GetComponent<Block>();
+
+            // Trap을 클릭한 경우
+            if (block.GetSprite().name.Contains("Trap_"))
+            {
+                // 선택되어 있는 경우
+                if (selectedTrap.GroupCheck(currentSelectedIdx, idx))
+                {
+                    // 선택된 메인블록과 trapGroup에서도 같은 그룹인 경우
+                    if (trapGroup.GroupCheck(currentSelectedIdx, idx))
+                    {
+                        // 새로운 집합으로 분리함
+                        selectedTrap.SplitElements(currentSelectedIdx, trapGroup.GetAllElementsList(idx));
+                    }
+                    // 선택된 메인블록과 trapGroup에서 다른 그룹인 경우
+                    else
+                    {
+                        // trapGroup에서의 집합으로 돌려보냄
+                        selectedTrap.SplitElements(currentSelectedIdx, trapGroup.GetAllElementsList(idx), trapGroup.GetRoot(idx));
+                    }
+                }
+                // 선택되어 있지 않은 경우
+                else
+                {
+                    // trapgroup에서 같은 그룹인 모든 trap을 합침
+                    foreach (Vector2Int vector2Int in trapGroup.GetAllElementsList(idx))
+                    {
+                        selectedTrap.Union(currentSelectedIdx, vector2Int);
+                    }
+
+                    // BlockSettingWindow 새로고침
+                    blockSettingWindow.RefreshTrap(idx, floorBlocks[idx.x][idx.y].GetComponent<Block>(), autoTrapSet.Contains(idx));
+                }
+
+                RefreshHighLight();
+            }
+            else
+            {
+                // Trap이 아닌 블록을 클릭한 경우 반응하지 않음
             }
         }
     }

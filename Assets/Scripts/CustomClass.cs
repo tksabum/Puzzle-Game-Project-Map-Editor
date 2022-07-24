@@ -215,11 +215,93 @@ namespace CustomClass
             Union(element, root);
         }
 
-        // 여러개의 원소를 원래의 집합에서 제거하고 그것들이 새로운 집합을 이루게 함
-        // 단, elements는 반드시 하나의 집합에 속해야 함
-        public void SplitElements(List<T> elements)
+        // elements를 mainElement가 속한 집합에서 분리하여 root집합에 포함시킨다.
+        // 단, elements에는 mainElement가 속할 수 있으며 mainElement는 분리하지 않음
+        public void SplitElements(T mainElement, List<T> elements, T root)
         {
-            // not implement
+            // mainElement를 루트 노드로 rank2의 트리로 변환
+            int mainElementNum = dict[mainElement];
+
+            int preRoot = Find(mainElementNum);
+            parent[mainElementNum] = mainElementNum;
+            rank[mainElementNum] = 1;
+
+            for (int i = 0; i < parent.Count; i++)
+            {
+                if (Find(i) == preRoot)
+                {
+                    parent[i] = mainElementNum;
+                    rank[mainElementNum] = 2;
+                }
+            }
+
+            // mainElement를 루트 노드로 하는 트리의 모드 노드를 분리하여 새로운 집합을 만듦
+            int preElementNum = -1;
+            for (int i = 0; i < elements.Count; i++)
+            {
+                int elementNum = dict[elements[i]];
+
+                if (elementNum != mainElementNum && Find(elementNum) == mainElementNum)
+                {
+                    parent[elementNum] = elementNum;
+                    rank[elementNum] = 1;
+                    if (preElementNum == -1)
+                    {
+                        preElementNum = elementNum;
+                    }
+                    else
+                    {
+                        Union(preElementNum, elementNum);
+                    }
+                }
+            }
+
+            if (preElementNum != -1)
+            {
+                Union(preElementNum, dict[root]);
+            }
+        }
+
+        // elements를 mainElement가 속한 집합에서 분리하여 새로운 집합으로 만듦
+        // 단, elements에는 mainElement가 속할 수 있으며 mainElement는 분리하지 않음
+        public void SplitElements(T mainElement, List<T> elements)
+        {
+            // mainElement를 루트 노드로 rank2의 트리로 변환
+            int mainElementNum = dict[mainElement];
+
+            int preRoot = Find(mainElementNum);
+            parent[mainElementNum] = mainElementNum;
+            rank[mainElementNum] = 1;
+
+            for (int i = 0; i < parent.Count; i++)
+            {
+                if (Find(i) == preRoot)
+                {
+                    parent[i] = mainElementNum;
+                    rank[mainElementNum] = 2;
+                }
+            }
+
+            // mainElement를 루트 노드로 하는 트리의 모드 노드를 분리하여 새로운 집합을 만듦
+            int preElementNum = -1;
+            for (int i = 0; i < elements.Count; i++)
+            {
+                int elementNum = dict[elements[i]];
+
+                if (elementNum != mainElementNum && Find(elementNum) == mainElementNum)
+                {
+                    parent[elementNum] = elementNum;
+                    rank[elementNum] = 1;
+                    if (preElementNum == -1)
+                    {
+                        preElementNum = elementNum;
+                    }
+                    else
+                    {
+                        Union(preElementNum, elementNum);
+                    }
+                }
+            }
         }
 
         // root노드로 새로운 원소를 추가함
@@ -299,6 +381,7 @@ namespace CustomClass
             }
         }
 
+        // 디버깅 용
         public override string ToString()
         {
             string str = "[count: " + values.Count + "] ";
