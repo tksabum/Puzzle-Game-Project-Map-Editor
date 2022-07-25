@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.IO;
 using SimpleFileBrowser;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine.SceneManagement;
 
 public class EditorManager : MonoBehaviour
 {
@@ -65,6 +66,12 @@ public class EditorManager : MonoBehaviour
     {
         sizeController.Init();
         drawLayer.Init();
+
+        string mapname = DataBus.Instance.ReadMapName();
+        if (mapname != null)
+        {
+            Load(Application.dataPath + "/MapData/" + mapname + ".dat");
+        }
     }
 
     void Init()
@@ -281,6 +288,24 @@ public class EditorManager : MonoBehaviour
                                    FileBrowser.PickMode.Files, false, defaultFolderPath, null, "Load", "Select");
     }
 
+    public void ButtonTestCurrentMap()
+    {
+        if (!isSaved)
+        {
+            selectWindow.OpenSelectWindow(null, null, false, "Not saved. Please save and try again.", "OK", "");
+            return;
+        }
+
+        if (filePath.Substring(0, filePath.LastIndexOf('\\')) != (Application.dataPath + "\\MapData").Replace('/', '\\'))
+        {
+            selectWindow.OpenSelectWindow(null, null, false, "Not default path. Please save to default path and try again.", "OK", "");
+            return;
+        }
+
+        DataBus.Instance.WriteMapName(fileName);
+        SceneManager.LoadScene("GameScene");
+    }
+
     public void ButtonSave()
     {
         if (fileName == DefaultFileName)
@@ -324,9 +349,9 @@ public class EditorManager : MonoBehaviour
     {
         if (File.Exists(path))
         {
-            int lastindexofslash = path.LastIndexOf('/');
+            int lastindexofslash = path.LastIndexOf('\\');
             fileName = path.Substring(lastindexofslash + 1, path.Length - (lastindexofslash + 1));
-            fileName.Substring(0, fileName.LastIndexOf(".dat"));
+            fileName = fileName.Substring(0, fileName.LastIndexOf(".dat"));
             filePath = path;
 
 
@@ -358,9 +383,9 @@ public class EditorManager : MonoBehaviour
             return;
         }
 
-        int lastindexofslash = path.LastIndexOf('/');
+        int lastindexofslash = path.LastIndexOf('\\');
         fileName = path.Substring(lastindexofslash + 1, path.Length - (lastindexofslash + 1));
-        fileName.Substring(0, fileName.LastIndexOf(".dat"));
+        fileName = fileName.Substring(0, fileName.LastIndexOf(".dat"));
         filePath = path;
 
         // MapData °´Ã¼»ý¼º
