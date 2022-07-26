@@ -67,10 +67,10 @@ public class EditorManager : MonoBehaviour
         sizeController.Init();
         drawLayer.Init();
 
-        string mapname = DataBus.Instance.ReadMapName();
-        if (mapname != null)
+        string mappath = DataBus.Instance.ReadMapPath();
+        if (mappath != null)
         {
-            Load(Application.dataPath + "/MapData/" + mapname + ".dat");
+            Load(mappath);
         }
     }
 
@@ -296,13 +296,7 @@ public class EditorManager : MonoBehaviour
             return;
         }
 
-        if (filePath.Substring(0, filePath.LastIndexOf('\\')).Replace('/', '\\') != (Application.dataPath + "\\MapData").Replace('/', '\\'))
-        {
-            selectWindow.OpenSelectWindow(null, null, false, "Not default path. Please save to default path and try again.", "OK", "");
-            return;
-        }
-
-        DataBus.Instance.WriteMapName(fileName);
+        DataBus.Instance.WriteMapPath(filePath);
         SceneManager.LoadScene("GameScene");
     }
 
@@ -371,7 +365,7 @@ public class EditorManager : MonoBehaviour
         }
         else
         {
-            throw new System.Exception("데이터 불러오기 실패");
+            throw new System.Exception("데이터 불러오기 실패" + path);
         }
     }
 

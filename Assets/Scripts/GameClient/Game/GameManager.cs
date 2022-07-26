@@ -73,14 +73,12 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        mapName = DataBus.Instance.ReadMapName();
+        dataPath = DataBus.Instance.ReadMapPath();
 
-        if (mapName == null)
-        {
-            mapName = testMapName;
-        }
-
-        dataPath = Application.dataPath + "/MapData/" + mapName + ".dat";
+        mapName = dataPath;
+        mapName = mapName.Replace('\\', '/');
+        mapName = mapName.Substring(mapName.LastIndexOf('/') + 1, mapName.Length - 1 - mapName.LastIndexOf('/'));
+        mapName = mapName.Substring(0, mapName.LastIndexOf(".dat"));
 
         mapData = Load();
 
@@ -469,7 +467,7 @@ public class GameManager : MonoBehaviour
     // 메뉴로 돌아가기
     public void ButtonBack()
     {
-        DataBus.Instance.WriteMapName(mapName);
+        DataBus.Instance.WriteMapPath(dataPath);
         SceneManager.LoadScene("MapEditor");
     }
 

@@ -5,12 +5,12 @@ using UnityEngine;
 public class DataBus : MonoBehaviour
 {
     //---------------------------------------------------
-    // MapName
+    // MapPath
 
     bool writeLock;
     string str;
 
-    public void WriteMapName(string mapName)
+    public void WriteMapPath(string mapName)
     {
         if (writeLock)
         {
@@ -20,7 +20,7 @@ public class DataBus : MonoBehaviour
         writeLock = true;
     }
 
-    public string ReadMapName()
+    public string ReadMapPath()
     {
         writeLock = false;
         return str;
