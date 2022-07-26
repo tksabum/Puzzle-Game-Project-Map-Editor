@@ -28,7 +28,6 @@ public class UIManager : MonoBehaviour
     {
         SetLife(life);
         SetMapName(mapName);
-        SetNextButton(mapName);
         SetPause(false);
         SetGameOver(false);
         SetGameClear(false);
@@ -99,18 +98,6 @@ public class UIManager : MonoBehaviour
         else
         {
             gameclearImage.SetActive(false);
-        }
-    }
-
-    public void SetNextButton(string mapName)
-    {
-        if (mapName.Length > 5 && mapName.Substring(0, 5) == "Story" && mapName[mapName.Length - 2] == '-')
-        {
-            nextButton.SetActive(true);
-        }
-        else
-        {
-            nextButton.SetActive(false);
         }
     }
 

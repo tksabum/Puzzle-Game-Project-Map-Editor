@@ -296,7 +296,7 @@ public class EditorManager : MonoBehaviour
             return;
         }
 
-        if (filePath.Substring(0, filePath.LastIndexOf('\\')) != (Application.dataPath + "\\MapData").Replace('/', '\\'))
+        if (filePath.Substring(0, filePath.LastIndexOf('\\')).Replace('/', '\\') != (Application.dataPath + "\\MapData").Replace('/', '\\'))
         {
             selectWindow.OpenSelectWindow(null, null, false, "Not default path. Please save to default path and try again.", "OK", "");
             return;
