@@ -367,18 +367,41 @@ namespace CustomClass
                         }
                     }
                 }
-                parent.RemoveAt(elementNum);
-                values.RemoveAt(elementNum);
-                rank.RemoveAt(elementNum);
-                dict.Remove(element);
+                
             }
-            else
+
+            parent.RemoveAt(elementNum);
+            values.RemoveAt(elementNum);
+            rank.RemoveAt(elementNum);
+            dict.Remove(element);
+
+            // RemoveAt을 하면 번호가 꼬이기 때문에 조정
+            // parent 수정
+            for (int i = 0; i < parent.Count; i++)
             {
-                parent.RemoveAt(elementNum);
-                values.RemoveAt(elementNum);
-                rank.RemoveAt(elementNum);
-                dict.Remove(element);
+                if (parent[i] > elementNum)
+                {
+                    parent[i]--;
+                }
             }
+
+            // dict 수정 foreach문에서 바로 수정할 경우 에러가 나서 hashset을 이용함
+            // value 만 수정하기 때문에 foreach문에 문제가 생기진 않지만
+            // dictionary의 특성상 dict[key] = value 가 데이터를 추가할 수 있기 때문인듯
+            HashSet<T> set = new HashSet<T>();
+            foreach (KeyValuePair<T, int> pair in dict)
+            {
+                if (pair.Value > elementNum)
+                {
+                    set.Add(pair.Key);
+                }
+            }
+
+            foreach(T s in set)
+            {
+                dict[s]--;
+            }
+
         }
 
         // 디버깅 용
