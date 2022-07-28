@@ -10870,6 +10870,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23ddbb2f8fe8c9346ab4319ad98de872, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  editorManager: {fileID: 811760454}
   drawLayer: {fileID: 1408521876}
   textBlockType: {fileID: 459905718}
   textBlockIdx: {fileID: 1606282791}

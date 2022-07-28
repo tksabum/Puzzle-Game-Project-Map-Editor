@@ -6,6 +6,7 @@ using TMPro;
 
 public class BlockSettingWindow : MonoBehaviour
 {
+    public EditorManager editorManager;
     public DrawLayer drawLayer;
 
     public TMP_Text textBlockType;
@@ -217,6 +218,7 @@ public class BlockSettingWindow : MonoBehaviour
             trapInfoEvenDelay.interactable = true;
 
             drawLayer.SetAutoTrap(true);
+            editorManager.ChangedAnyData();
         }
     }
 
@@ -235,6 +237,7 @@ public class BlockSettingWindow : MonoBehaviour
             trapInfoEvenDelay.interactable = false;
 
             drawLayer.SetAutoTrap(false);
+            editorManager.ChangedAnyData();
         }
     }
 
@@ -281,5 +284,6 @@ public class BlockSettingWindow : MonoBehaviour
 
         drawLayer.SetDelay(firstdelay, odddelay, evendelay);
         drawLayer.SetAutoTrap(true);
+        editorManager.ChangedAnyData();
     }
 }

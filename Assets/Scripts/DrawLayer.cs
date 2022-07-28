@@ -66,9 +66,7 @@ public class DrawLayer : MonoBehaviour
             floorBlocks.Add(new List<GameObject>());
             for (int j = 0; j < 99; j++)
             {
-                GameObject inst = Instantiate(floorBlock, new Vector3(i, j, 0), Quaternion.identity, floorLayer.transform);
-                inst.GetComponent<Block>().SetIdx(new Vector2Int(i, j));
-                floorBlocks[i].Add(inst);
+                floorBlocks[i].Add(null);
             }
         }
 
@@ -79,7 +77,7 @@ public class DrawLayer : MonoBehaviour
             itemBlocks.Add(new List<GameObject>());
             for (int j = 0; j < 99; j++)
             {
-                itemBlocks[i].Add(Instantiate(itemBlock, new Vector3(i, j, 0), Quaternion.identity, itemLayer.transform));
+                itemBlocks[i].Add(null);
             }
         }
 
@@ -90,9 +88,7 @@ public class DrawLayer : MonoBehaviour
             triggerBlocks.Add(new List<GameObject>());
             for (int j = 0; j < 99; j++)
             {
-                GameObject inst = Instantiate(triggerBlock, new Vector3(i, j, 0), Quaternion.identity, triggerLayer.transform);
-                inst.GetComponent<TriggerBlock>().SetIdx(new Vector2Int(i, j));
-                triggerBlocks[i].Add(inst);
+                triggerBlocks[i].Add(null);
             }
         }
 
@@ -102,7 +98,7 @@ public class DrawLayer : MonoBehaviour
             highlightBlocks.Add(new List<GameObject>());
             for (int j = 0; j < 99; j++)
             {
-                highlightBlocks[i].Add(Instantiate(highlightBlock, new Vector3(i, j, 0), Quaternion.identity, highlightLayer.transform));
+                highlightBlocks[i].Add(null);
             }
         }
 
@@ -262,6 +258,31 @@ public class DrawLayer : MonoBehaviour
             {
                 if (i < width && j < height)
                 {
+                    // Block이 없을 경우 생성
+                    if (floorBlocks[i][j] == null)
+                    {
+                        GameObject inst = Instantiate(floorBlock, new Vector3(i, j, 0), Quaternion.identity, floorLayer.transform);
+                        inst.GetComponent<Block>().SetIdx(new Vector2Int(i, j));
+                        floorBlocks[i][j] = inst;
+                    }
+
+                    if (itemBlocks[i][j] == null)
+                    {
+                        itemBlocks[i][j] = Instantiate(itemBlock, new Vector3(i, j, 0), Quaternion.identity, itemLayer.transform);
+                    }
+
+                    if (triggerBlocks[i][j] == null)
+                    {
+                        GameObject inst = Instantiate(triggerBlock, new Vector3(i, j, 0), Quaternion.identity, triggerLayer.transform);
+                        inst.GetComponent<TriggerBlock>().SetIdx(new Vector2Int(i, j));
+                        triggerBlocks[i][j] = inst;
+                    }
+
+                    if (highlightBlocks[i][j] == null)
+                    {
+                        highlightBlocks[i][j] = Instantiate(highlightBlock, new Vector3(i, j, 0), Quaternion.identity, highlightLayer.transform);
+                    }
+
                     floorBlocks[i][j].SetActive(true);
                     itemBlocks[i][j].SetActive(true);
                     triggerBlocks[i][j].SetActive(true);
@@ -269,10 +290,11 @@ public class DrawLayer : MonoBehaviour
                 }
                 else
                 {
-                    floorBlocks[i][j].SetActive(false);
-                    itemBlocks[i][j].SetActive(false);
-                    triggerBlocks[i][j].SetActive(false);
-                    highlightBlocks[i][j].SetActive(false);
+                    // Block이 없을 경우 무시
+                    if (floorBlocks[i][j] != null) floorBlocks[i][j].SetActive(false);
+                    if (itemBlocks[i][j] != null) itemBlocks[i][j].SetActive(false);
+                    if (triggerBlocks[i][j] != null) triggerBlocks[i][j].SetActive(false);
+                    if (highlightBlocks[i][j] != null) highlightBlocks[i][j].SetActive(false);
                 }
             }
         }
