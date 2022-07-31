@@ -40,7 +40,7 @@ public class BlockManager : MonoBehaviour
     public void Tick()
     {
         // Trap 작동
-        for(int i = 0; i < tickTrapList.Count; i++)
+        for (int i = 0; i < tickTrapList.Count; i++)
         {
             Vector2Int ticktrapidx = tickTrapList[i];
             Trap ticktrap = (Trap)floorList[ticktrapidx.x][ticktrapidx.y];
@@ -133,7 +133,7 @@ public class BlockManager : MonoBehaviour
                 {
                     bool enterableItem = floorList[pushidx.x][pushidx.y].Enterable(nextitem.obj, enterDir);
                     bool exitableItem = floorList[nextidx.x][nextidx.y].Exitable(nextitem.obj, exitDir);
-                    
+
                     if (enterableItem && exitableItem)
                     {
                         return true;
@@ -151,7 +151,7 @@ public class BlockManager : MonoBehaviour
             }
         }
     }
-    
+
     // ####### 이동시 이벤트는 Exit -> Enter 순서로 처리한다.
     // 이동 전 발생하는 이벤트
     public void PreMoveEvent(Obj obj, Vector2Int nowidx, Vector2Int nextidx)
@@ -261,7 +261,7 @@ public class BlockManager : MonoBehaviour
 
         return false;
     }
-    
+
     // 각각의 아이템 사용 처리
     public void ItemUseEvent(Obj obj, Vector2Int playerPos, Direction direction)
     {
@@ -392,7 +392,7 @@ public class BlockManager : MonoBehaviour
         tickTrapList = new List<Vector2Int>();
         if (mapData.trapData != null)
         {
-            foreach(KeyValuePair<PairInt, ThreeInt> keyValuePair in mapData.trapData)
+            foreach (KeyValuePair<PairInt, ThreeInt> keyValuePair in mapData.trapData)
             {
                 Vector2Int key = Vector2Int.zero;
                 key.x = keyValuePair.Key.x;
@@ -446,6 +446,38 @@ public class BlockManager : MonoBehaviour
                 {
                     objectPool.ReturnObject(itemList[i][j].gameObject);
                 }
+            }
+        }
+    }
+
+    public void GenerateItem(Obj obj, Vector2Int genIdx)
+    {
+        string objName = "";
+        if (obj == Obj.WOODENBOX)
+        {
+            objName = "WoodenBox";
+        }
+        else if (obj == Obj.HAMMER)
+        {
+            objName = "Hammer";
+        }
+        else if (obj == Obj.LIFE)
+        {
+            objName = "Life";
+        }
+
+
+        if (objName == "")
+        {
+            throw new System.Exception("Error: unknown objName " + obj);
+        }
+        else
+        {
+            // 아이템이 생성될 위치가 비어있는 경우에만 생성
+            if (genIdx != gameManager.GetPlayerIdx() && genIdx != gameManager.GetPlayerNextIdx() && itemList[genIdx.x][genIdx.y] == null)
+            {
+                GameObject instant = objectPool.GetObject(objName);
+                itemList[genIdx.x][genIdx.y] = instant.GetComponent<Itembase>();
             }
         }
     }

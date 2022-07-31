@@ -8,7 +8,8 @@ public enum FloorType
     WATER,
     BUTTON,
     TRAP,
-    PORTAL
+    PORTAL,
+    GENERATOR
 }
 
 public abstract class Floorbase : MonoBehaviour
@@ -82,7 +83,7 @@ public abstract class Floorbase : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void SetIdx(Vector2Int _idx)

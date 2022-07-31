@@ -1489,6 +1489,7 @@ MonoBehaviour:
   player: {fileID: 802192101}
   playerAnimator: {fileID: 802192102}
   playerSpeed: 3
+  playerOffset: {x: -0.03125, y: 0.1875}
   mainCamera: {fileID: 519420031}
   zoomSpeed: 1
   minCameraSize: 4
