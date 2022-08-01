@@ -15,6 +15,7 @@ public class BlockManager : MonoBehaviour
     Dictionary<Vector2Int, List<Vector2Int>> powerDic;
     Dictionary<Vector2Int, Vector2Int> portalDic;
     List<Vector2Int> tickTrapList;
+    List<Vector2Int> tickGeneratorList;
 
     public enum Obj { EMPTY, PLAYER, WOODENBOX, GOAL, HAMMER, LIFE };
     public enum Direction { LEFT, RIGHT, UP, DOWN };
@@ -49,6 +50,15 @@ public class BlockManager : MonoBehaviour
             {
                 ticktrap.PowerToggle(gameManager);
             }
+        }
+
+        // Generator 작동
+        for (int i = 0; i < tickGeneratorList.Count; i++)
+        {
+            Vector2Int tickgeneratoridx = tickGeneratorList[i];
+            ItemGenerator tickgenerator = (ItemGenerator)floorList[tickgeneratoridx.x][tickgeneratoridx.y];
+
+            tickgenerator.Tick(this, tickCount);
         }
 
         tickCount++;
@@ -405,6 +415,18 @@ public class BlockManager : MonoBehaviour
             }
         }
 
+        tickGeneratorList = new List<Vector2Int>();
+        for (int i = 0; i < mapwidth; i++)
+        {
+            for (int j = 0; j < mapheight; j++)
+            {
+                if (mapData.floorData[i][j].Contains("ItemGenerator_"))
+                {
+                    tickGeneratorList.Add(new Vector2Int(i, j));
+                }
+            }
+        }
+
 
         // 아이템이 올려져 있는 버튼과 같은 floor들을 작동시키기 위해 OnObjectEnter 실행
         for (int i = 0; i < mapwidth; i++)
@@ -477,6 +499,7 @@ public class BlockManager : MonoBehaviour
             if (genIdx != gameManager.GetPlayerIdx() && genIdx != gameManager.GetPlayerNextIdx() && itemList[genIdx.x][genIdx.y] == null)
             {
                 GameObject instant = objectPool.GetObject(objName);
+                instant.transform.position = (Vector2)genIdx;
                 itemList[genIdx.x][genIdx.y] = instant.GetComponent<Itembase>();
             }
         }

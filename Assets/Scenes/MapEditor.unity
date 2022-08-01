@@ -1181,6 +1181,59 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 65197254}
   m_CullTransparentMesh: 1
+--- !u!1 &82279516
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 82279517}
+  - component: {fileID: 82279518}
+  m_Layer: 0
+  m_Name: ItemGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &82279517
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 82279516}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1681021649}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &82279518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 82279516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3e7644f83bf1bf458b432dfcfd89274, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: {x: 3, y: 2}
+  titleSprite: {fileID: 436230709, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
+  sprites:
+  - {fileID: 436230709, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
+  - {fileID: -1532822094, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
+  - {fileID: 1007372975, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
+  - {fileID: -295662073, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
+  - {fileID: -382282289, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
+  - {fileID: 1175780195, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
 --- !u!1 &99770762
 GameObject:
   m_ObjectHideFlags: 0
@@ -31160,6 +31213,7 @@ Transform:
   - {fileID: 1098071106}
   - {fileID: 1511096006}
   - {fileID: 521794189}
+  - {fileID: 82279517}
   m_Father: {fileID: 29082095}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -32773,6 +32827,7 @@ MonoBehaviour:
   - {fileID: 1098071107}
   - {fileID: 1511096007}
   - {fileID: 521794190}
+  - {fileID: 82279518}
   itemList:
   - {fileID: 599434512}
   - {fileID: 852863551}

@@ -57,7 +57,7 @@ public class ItemGenerator : Floorbase
         power = !power;
 
         // 전원이 켜질 때 위에 놓여진 아이템이 없는 경우
-        if (power && !isObjectEntered)
+        if (generatorType == GeneratorType.POWER && power && !isObjectEntered)
         {
             GenerateItem(gameManager.blockManager);
         }
@@ -70,7 +70,7 @@ public class ItemGenerator : Floorbase
 
     public void Tick(BlockManager blockManager, int tickCount)
     {
-        if (tickCount % generationCycle == 0 && !isObjectEntered)
+        if (generatorType == GeneratorType.TIME && tickCount % generationCycle == 0 && !isObjectEntered)
         {
             GenerateItem(blockManager);
         }
