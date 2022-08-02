@@ -33,7 +33,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -1165,9 +1165,9 @@ TextureImporter:
       Trap_4: -1437470201
       Trap_18: -915478805
       Trap_19: 1667428756
+      Trap_34: 784588338
       Trap_1: 1331288924
       Trap_22: 319936905
-      Trap_34: 784588338
       Trap_45: -511091716
       Trap_35: -451656697
       Trap_31: -232836628

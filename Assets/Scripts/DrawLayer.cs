@@ -37,6 +37,8 @@ public class DrawLayer : MonoBehaviour
 
     int mapWidth;
     int mapHeight;
+    const int MAXWIDTH = 99;
+    const int MAXHEIGHT = 99;
 
     bool isOpenedBlockSetting;
     Block currentSelectedBlock;
@@ -61,10 +63,10 @@ public class DrawLayer : MonoBehaviour
     private void Awake()
     {
         floorBlocks = new List<List<GameObject>>();
-        for (int i = 0; i < 99; i++)
+        for (int i = 0; i < MAXWIDTH; i++)
         {
             floorBlocks.Add(new List<GameObject>());
-            for (int j = 0; j < 99; j++)
+            for (int j = 0; j < MAXHEIGHT; j++)
             {
                 floorBlocks[i].Add(null);
             }
@@ -72,10 +74,10 @@ public class DrawLayer : MonoBehaviour
 
 
         itemBlocks = new List<List<GameObject>>();
-        for (int i = 0; i < 99; i++)
+        for (int i = 0; i < MAXWIDTH; i++)
         {
             itemBlocks.Add(new List<GameObject>());
-            for (int j = 0; j < 99; j++)
+            for (int j = 0; j < MAXHEIGHT; j++)
             {
                 itemBlocks[i].Add(null);
             }
@@ -83,20 +85,20 @@ public class DrawLayer : MonoBehaviour
 
 
         triggerBlocks = new List<List<GameObject>>();
-        for (int i = 0; i < 99; i++)
+        for (int i = 0; i < MAXWIDTH; i++)
         {
             triggerBlocks.Add(new List<GameObject>());
-            for (int j = 0; j < 99; j++)
+            for (int j = 0; j < MAXHEIGHT; j++)
             {
                 triggerBlocks[i].Add(null);
             }
         }
 
         highlightBlocks = new List<List<GameObject>>();
-        for (int i = 0; i < 99; i++)
+        for (int i = 0; i < MAXWIDTH; i++)
         {
             highlightBlocks.Add(new List<GameObject>());
-            for (int j = 0; j < 99; j++)
+            for (int j = 0; j < MAXHEIGHT; j++)
             {
                 highlightBlocks[i].Add(null);
             }
@@ -116,12 +118,19 @@ public class DrawLayer : MonoBehaviour
         autoTrapSet = new HashSet<Vector2Int>();
         trapGroup = new DisjointSet<Vector2Int>();
 
-        for (int i = 0; i < mapWidth; i++)
+        for (int i = 0; i < MAXWIDTH; i++)
         {
-            for (int j = 0; j < mapHeight; j++)
+            for (int j = 0; j < MAXHEIGHT; j++)
             {
-                floorBlocks[i][j].GetComponent<Block>().Clear();
-                itemBlocks[i][j].GetComponent<Block>().Clear();
+                if (floorBlocks[i][j] != null)
+                {
+                    floorBlocks[i][j].GetComponent<Block>().Clear();
+                }
+                
+                if (itemBlocks[i][j] != null)
+                {
+                    itemBlocks[i][j].GetComponent<Block>().Clear();
+                }
             }
         }
     }

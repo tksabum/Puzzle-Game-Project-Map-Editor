@@ -33,7 +33,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -1141,8 +1141,8 @@ TextureImporter:
       Plane_30: 1510597633
       Plane_31: 1759143282
       Plane_40: 41423954
-      Plane_8: 551856119
       Plane_45: -966628154
+      Plane_8: 551856119
       Plane_26: 1277208536
       Plane_2: -323177066
       Plane_17: 1276413879
