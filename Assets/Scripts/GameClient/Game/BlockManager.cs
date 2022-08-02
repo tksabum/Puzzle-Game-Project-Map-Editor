@@ -305,6 +305,11 @@ public class BlockManager : MonoBehaviour
     // 누른 버튼의 좌표를 키값으로 powerDic에서 얻은 좌표의 floor의 전원을 토글함
     public void PowerToggle(Vector2Int buttonIdx)
     {
+        if (!powerDic.ContainsKey(buttonIdx))
+        {
+            return;
+        }
+
         List<Vector2Int> consumerList = powerDic[buttonIdx];
         for (int i = 0; i < consumerList.Count; i++)
         {
