@@ -225,6 +225,10 @@ public class BlockManager : MonoBehaviour
             {
                 nextitem.OnPlayerEnter(gameManager);
                 itemList[nextidx.x][nextidx.y] = null;
+
+                // 아이템이 놓여있던 바닥의 ExitEvent
+                floorList[nextidx.x][nextidx.y].OnObjectExit(gameManager, this, nextitem.obj);
+
                 objectPool.ReturnObject(nextitem.gameObject);
             }
         }
@@ -311,6 +315,7 @@ public class BlockManager : MonoBehaviour
         }
 
         List<Vector2Int> consumerList = powerDic[buttonIdx];
+
         for (int i = 0; i < consumerList.Count; i++)
         {
             Vector2Int consumerIdx = consumerList[i];
@@ -493,7 +498,6 @@ public class BlockManager : MonoBehaviour
             objName = "Life";
         }
 
-
         if (objName == "")
         {
             throw new System.Exception("Error: unknown objName " + obj);
@@ -503,9 +507,13 @@ public class BlockManager : MonoBehaviour
             // 아이템이 생성될 위치가 비어있는 경우에만 생성
             if (genIdx != gameManager.GetPlayerIdx() && genIdx != gameManager.GetPlayerNextIdx() && itemList[genIdx.x][genIdx.y] == null)
             {
+                // 아이템 생성
                 GameObject instant = objectPool.GetObject(objName);
                 instant.transform.position = (Vector2)genIdx;
                 itemList[genIdx.x][genIdx.y] = instant.GetComponent<Itembase>();
+
+                // 아이템이 생성된 위치의 바닥에 EnterEvent 발생
+                floorList[genIdx.x][genIdx.y].OnObjectEnter(gameManager, this, obj);
             }
         }
     }
