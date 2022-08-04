@@ -22,6 +22,11 @@ public class ItemGenerator : Floorbase
     {
         base.Awake();
 
+        Init();
+    }
+
+    void Init()
+    {
         isObjectEntered = false;
         power = powerDefault;
     }
@@ -74,5 +79,10 @@ public class ItemGenerator : Floorbase
         {
             GenerateItem(blockManager);
         }
+    }
+
+    void OnDisable()
+    {
+        Init();
     }
 }
