@@ -47,8 +47,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerEnterable: 1
   woodenboxEnterable: 1
+  sturdyboxEnterable: 1
+  steelboxEnterable: 1
   playerExitable: 1
   woodenboxExitable: 1
+  sturdyboxExitable: 1
+  steelboxExitable: 1
   leftEnterable: 0
   rightEnterable: 1
   upEnterable: 0
@@ -57,7 +61,6 @@ MonoBehaviour:
   rightExitable: 1
   upExitable: 0
   downExitable: 0
-  floorType: 3
   spriteOn: {fileID: 1667428756, guid: bbb02b9b218108e4793d0213ca386499, type: 3}
   spriteOff: {fileID: -1298590015, guid: bbb02b9b218108e4793d0213ca386499, type: 3}
   powerType: 1

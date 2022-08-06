@@ -17,7 +17,7 @@ public class BlockManager : MonoBehaviour
     List<Vector2Int> tickTrapList;
     List<Vector2Int> tickGeneratorList;
 
-    public enum Obj { EMPTY, PLAYER, WOODENBOX, GOAL, HAMMER, LIFE };
+    public enum Obj { EMPTY, PLAYER, WOODENBOX, GOAL, HAMMER, LIFE, STURDYBOX, STEELBOX, ROCK };
     public enum Direction { LEFT, RIGHT, UP, DOWN };
 
     int mapwidth;
@@ -26,6 +26,11 @@ public class BlockManager : MonoBehaviour
     MapData mapData;
 
     int tickCount;
+
+    Itembase moveItem;
+    Vector2Int moveItemStartidx;
+    Vector2Int moveItemEndidx;
+    bool isMove;
 
     string GetFloorString(Vector3Int vector)
     {
@@ -48,7 +53,7 @@ public class BlockManager : MonoBehaviour
 
             if (ticktrap.ToggleOnCurrentTick(tickCount))
             {
-                ticktrap.PowerToggle(gameManager);
+                ticktrap.PowerToggle(gameManager, this);
             }
         }
 
@@ -67,11 +72,13 @@ public class BlockManager : MonoBehaviour
     // 이동 가능 여부 판단
     public bool Movable(Obj obj, Vector2Int nowidx, Vector2Int nextidx)
     {
+        // 이동할 위치가 맵 밖인 경우
         if (nextidx.x < 0 || mapwidth <= nextidx.x || nextidx.y < 0 || mapheight <= nextidx.y)
         {
             return false;
         }
 
+        // 방향계산
         Vector2Int move = nextidx - nowidx;
         Direction enterDir = Direction.LEFT;
         Direction exitDir = Direction.RIGHT;
@@ -101,67 +108,55 @@ public class BlockManager : MonoBehaviour
         bool exitableFloor = floorList[nowidx.x][nowidx.y].Exitable(obj, exitDir);
 
         Itembase nextitem = itemList[nextidx.x][nextidx.y];
-        // 이동할 자리에 아이템이 없는 경우
-        if (nextitem == null)
-        {
-            if (enterableFloor && exitableFloor)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        // 이동할 자리에 아이템이 있는 경우
-        else
-        {
-            bool pushableItem = nextitem.pushable;
-            bool getableItem = nextitem.getable;
 
-            // 획득 가능한 아이템
-            if (getableItem)
+        // 움직일 오브젝트가 플레이어인 경우
+        if (obj == Obj.PLAYER)
+        {
+            // 이동할 자리에 아이템이 없는 경우
+            if (nextitem == null)
             {
-                return true;
-            }
-            // 밀 수 있는 아이템
-            else if (pushableItem)
-            {
-                Vector2Int pushidx = nextidx + move;
-                // 밀리는 블록이 맵을 벗어나서 밀지 못하는 경우
-                if (pushidx.x < 0 || mapwidth <= pushidx.x || pushidx.y < 0 || mapheight <= pushidx.y)
+                if (enterableFloor && exitableFloor)
                 {
-                    return false;
+                    return true;
                 }
-                // 아이템이 밀려날 자리에 다른 아이템이 있는 경우
-                else if (itemList[pushidx.x][pushidx.y] != null)
-                {
-                    return false;
-                }
-                // 아닌 경우 floor가 아이템이 이동할 수 있는 floor인지 확인
                 else
                 {
-                    bool enterableItem = floorList[pushidx.x][pushidx.y].Enterable(nextitem.obj, enterDir);
-                    bool exitableItem = floorList[nextidx.x][nextidx.y].Exitable(nextitem.obj, exitDir);
-
-                    if (enterableItem && exitableItem)
+                    return false;
+                }
+            }
+            // 이동할 자리에 아이템이 있는 경우
+            else
+            {
+                Vector2Int pushidx = nextidx + move;
+                if (nextitem.getable || (nextitem.pushable && Movable(nextitem.obj, nextidx, pushidx)))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        // 움직일 오브젝트가 아이템인 경우
+        else
+        {
+            if (itemList[nowidx.x][nowidx.y].pushable && itemList[nowidx.x][nowidx.y].pushCost < gameManager.GetLife())
+            {
+                if (itemList[nextidx.x][nextidx.y] == null)
+                {
+                    if (enterableFloor && exitableFloor)
                     {
                         return true;
                     }
-                    else
-                    {
-                        return false;
-                    }
                 }
             }
-            // 그 외의 아이템
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
     }
 
+    // ####### 이동시 이벤트는 item -> floor 순서로 처리한다.
     // ####### 이동시 이벤트는 Exit -> Enter 순서로 처리한다.
     // 이동 전 발생하는 이벤트
     public void PreMoveEvent(Obj obj, Vector2Int nowidx, Vector2Int nextidx)
@@ -170,48 +165,33 @@ public class BlockManager : MonoBehaviour
         Itembase nextitem = itemList[nextidx.x][nextidx.y];
         if (nextitem != null)
         {
-            if (nextitem.pushable)
-            {
-                Vector2Int pushidx = 2 * nextidx - nowidx;
-                itemList[pushidx.x][pushidx.y] = nextitem;
-                itemList[nextidx.x][nextidx.y] = null;
-                nextitem.transform.position = new Vector3Int(pushidx.x, pushidx.y, 0);
-                floorList[nextidx.x][nextidx.y].OnObjectExit(gameManager, this, nextitem.obj);
-                floorList[pushidx.x][pushidx.y].OnObjectEnter(gameManager, this, nextitem.obj);
-            }
+            nextitem.OnPrePlayerEnter(gameManager, this, nowidx, nextidx);
         }
 
         // floor
         Floorbase nowfloor = floorList[nowidx.x][nowidx.y];
         Floorbase nextfloor = floorList[nextidx.x][nextidx.y];
 
-        if (nowfloor.GetOccurInPreEvent())
-        {
-            nowfloor.OnObjectExit(gameManager, this, obj);
-        }
-
-        if (nextfloor.GetOccurInPreEvent())
-        {
-            nextfloor.OnObjectEnter(gameManager, this, obj);
-        }
+        nowfloor.OnPreObjectExit(gameManager, this, obj);
+        nextfloor.OnPreObjectEnter(gameManager, this, obj);
     }
 
     // 이동중 이전 블록보다 다음 블록에 더 가까워진 순간 발생하는 이벤트
     public void MoveEvent(Obj obj, Vector2Int nowidx, Vector2Int nextidx)
     {
+        // item
+        Itembase nextitem = itemList[nextidx.x][nextidx.y];
+        if (nextitem != null)
+        {
+            nextitem.OnPlayerEnter(gameManager, this, nowidx, nextidx);
+        }
+
         // floor
         Floorbase nowfloor = floorList[nowidx.x][nowidx.y];
         Floorbase nextfloor = floorList[nextidx.x][nextidx.y];
 
-        if (nowfloor.GetOccurInEvent())
-        {
-            nowfloor.OnObjectExit(gameManager, this, obj);
-        }
-
-        if (nextfloor.GetOccurInEvent())
-        {
-            nextfloor.OnObjectEnter(gameManager, this, obj);
-        }
+        nowfloor.OnObjectExit(gameManager, this, obj);
+        nextfloor.OnObjectEnter(gameManager, this, obj);
     }
 
     // 다음 블록으로 완전히 이동 후 발생하는 이벤트
@@ -221,31 +201,15 @@ public class BlockManager : MonoBehaviour
         Itembase nextitem = itemList[nextidx.x][nextidx.y];
         if (nextitem != null)
         {
-            if (nextitem.getable)
-            {
-                nextitem.OnPlayerEnter(gameManager);
-                itemList[nextidx.x][nextidx.y] = null;
-
-                // 아이템이 놓여있던 바닥의 ExitEvent
-                floorList[nextidx.x][nextidx.y].OnObjectExit(gameManager, this, nextitem.obj);
-
-                objectPool.ReturnObject(nextitem.gameObject);
-            }
+            nextitem.OnPostPlayerEnter(gameManager, this, nowidx, nextidx);
         }
 
         // floor
         Floorbase nowfloor = floorList[nowidx.x][nowidx.y];
         Floorbase nextfloor = floorList[nextidx.x][nextidx.y];
 
-        if (nowfloor.GetOccurInPostEvent())
-        {
-            nowfloor.OnObjectExit(gameManager, this, obj);
-        }
-
-        if (nextfloor.GetOccurInPostEvent())
-        {
-            nextfloor.OnObjectEnter(gameManager, this, obj);
-        }
+        nowfloor.OnPostObjectExit(gameManager, this, obj);
+        nextfloor.OnPostObjectEnter(gameManager, this, obj);
     }
 
     // 아이템 사용 가능 여부 판단
@@ -319,7 +283,7 @@ public class BlockManager : MonoBehaviour
         for (int i = 0; i < consumerList.Count; i++)
         {
             Vector2Int consumerIdx = consumerList[i];
-            floorList[consumerIdx.x][consumerIdx.y].PowerToggle(gameManager);
+            floorList[consumerIdx.x][consumerIdx.y].PowerToggle(gameManager, this);
         }
     }
 
@@ -446,14 +410,18 @@ public class BlockManager : MonoBehaviour
                 Itembase item = itemList[i][j];
                 if (item != null)
                 {
+                    floorList[i][j].OnPreObjectEnter(gameManager, this, item.obj);
                     floorList[i][j].OnObjectEnter(gameManager, this, item.obj);
+                    floorList[i][j].OnPostObjectEnter(gameManager, this, item.obj);
                 }
             }
         }
 
         // 플레이어 위치의 floor를 작동시키기 위해 OnObjectEnter 실행
         Vector2Int playeridx = gameManager.GetPlayerIdx();
+        floorList[playeridx.x][playeridx.y].OnPreObjectEnter(gameManager, this, Obj.PLAYER);
         floorList[playeridx.x][playeridx.y].OnObjectEnter(gameManager, this, Obj.PLAYER);
+        floorList[playeridx.x][playeridx.y].OnPostObjectEnter(gameManager, this, Obj.PLAYER);
 
         tickCount = 0;
     }
@@ -505,7 +473,7 @@ public class BlockManager : MonoBehaviour
         else
         {
             // 아이템이 생성될 위치가 비어있는 경우에만 생성
-            if (genIdx != gameManager.GetPlayerIdx() && genIdx != gameManager.GetPlayerNextIdx() && itemList[genIdx.x][genIdx.y] == null)
+            if (genIdx != gameManager.GetPlayerIdx() && genIdx != gameManager.GetPlayerNextIdx() && itemList[genIdx.x][genIdx.y] == null && (!isMove || moveItemEndidx != genIdx))
             {
                 // 아이템 생성
                 GameObject instant = objectPool.GetObject(objName);
@@ -513,8 +481,75 @@ public class BlockManager : MonoBehaviour
                 itemList[genIdx.x][genIdx.y] = instant.GetComponent<Itembase>();
 
                 // 아이템이 생성된 위치의 바닥에 EnterEvent 발생
+                floorList[genIdx.x][genIdx.y].OnPreObjectEnter(gameManager, this, obj);
                 floorList[genIdx.x][genIdx.y].OnObjectEnter(gameManager, this, obj);
+                floorList[genIdx.x][genIdx.y].OnPostObjectEnter(gameManager, this, obj);
             }
         }
+    }
+
+    public void PreItemMoveEvent(Itembase item, Vector2Int nowidx, Vector2Int nextidx)
+    {
+        moveItem = item;
+        moveItemStartidx = nowidx;
+        moveItemEndidx = nextidx;
+        isMove = true;
+
+        floorList[nowidx.x][nowidx.y].OnPreObjectExit(gameManager, this, item.obj);
+        floorList[nextidx.x][nextidx.y].OnPreObjectEnter(gameManager, this, item.obj);
+    }
+
+    public void ItemMoveEvent(Itembase item, Vector2Int nowidx, Vector2Int nextidx)
+    {
+        floorList[nowidx.x][nowidx.y].OnObjectExit(gameManager, this, item.obj);
+        floorList[nextidx.x][nextidx.y].OnObjectEnter(gameManager, this, item.obj);
+    }
+
+    public void PostItemMoveEvent(Itembase item, Vector2Int nowidx, Vector2Int nextidx)
+    {
+        floorList[nowidx.x][nowidx.y].OnPostObjectExit(gameManager, this, item.obj);
+        floorList[nextidx.x][nextidx.y].OnPostObjectEnter(gameManager, this, item.obj);
+    }
+
+    public void ItemMoveUpdate(Vector2 itemPos, bool isChangedidx)
+    {
+        if (isMove)
+        {
+            moveItem.transform.position = itemPos;
+
+            if (isChangedidx)
+            {
+                itemList[moveItemEndidx.x][moveItemEndidx.y] = moveItem;
+                itemList[moveItemStartidx.x][moveItemStartidx.y] = null;
+
+                gameManager.AttackedPlayer(moveItem.pushCost);
+            }
+
+            if (itemPos == (Vector2)moveItemEndidx)
+            {
+                isMove = false;
+            }
+        }
+    }
+
+    public void RemoveItem(Itembase item, Vector2Int idx)
+    {
+        itemList[idx.x][idx.y] = null;
+
+        // 아이템이 놓여있던 바닥의 ExitEvent
+        floorList[idx.x][idx.y].OnPreObjectExit(gameManager, this, item.obj);
+        floorList[idx.x][idx.y].OnObjectExit(gameManager, this, item.obj);
+        floorList[idx.x][idx.y].OnPostObjectExit(gameManager, this, item.obj);
+
+        objectPool.ReturnObject(item.gameObject);
+    }
+
+    public Direction VtoDir(Vector2Int nowidx, Vector2Int nextidx)
+    {
+        if (nextidx - nowidx == Vector2Int.left) return Direction.LEFT;
+        else if (nextidx - nowidx == Vector2Int.right) return Direction.RIGHT;
+        else if (nextidx - nowidx == Vector2Int.up) return Direction.UP;
+        else if (nextidx - nowidx == Vector2Int.down) return Direction.DOWN;
+        else throw new System.Exception("Error: wrong Direction");
     }
 }

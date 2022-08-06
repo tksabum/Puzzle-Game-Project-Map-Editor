@@ -315,6 +315,8 @@ public class GameManager : MonoBehaviour
     // 이동 중 애니메이션
     void MoveStateAnime()
     {
+        bool isChangedidx = false;
+
         if (moveType == MoveType.WALK)
         {
             // 애니메이션 재생
@@ -349,6 +351,7 @@ public class GameManager : MonoBehaviour
 
                     // 이동 중 이벤트 처리
                     blockManager.MoveEvent(BlockManager.Obj.PLAYER, walkStartPos, walkEndPos);
+                    isChangedidx = true;
                 }
                 SetPlayerPosition(nextPos);
             }
@@ -358,6 +361,8 @@ public class GameManager : MonoBehaviour
                 moveState = MoveState.POSTANIME;
             }
         }
+
+        blockManager.ItemMoveUpdate(GetPlayerPosition() + (Vector2)(walkEndPos - walkStartPos), isChangedidx);
     }
 
     // 이동 후 애니메이션
@@ -402,6 +407,11 @@ public class GameManager : MonoBehaviour
     public void AttackedPlayer()
     {
         addLife(-1);
+    }
+
+    public void AttackedPlayer(int damage)
+    {
+        addLife(-damage);
     }
 
     // 특정 위치 공격 받음
@@ -617,5 +627,10 @@ public class GameManager : MonoBehaviour
     Vector2 GetPlayerPosition()
     {
         return player.transform.position - (Vector3)playerOffset;
+    }
+
+    public int GetLife()
+    {
+        return life;
     }
 }

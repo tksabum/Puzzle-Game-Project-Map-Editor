@@ -46,9 +46,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerEnterable: 0
-  woodenboxEnterable: 1
+  woodenboxEnterable: 0
+  sturdyboxEnterable: 0
+  steelboxEnterable: 0
   playerExitable: 0
   woodenboxExitable: 0
+  sturdyboxExitable: 0
+  steelboxExitable: 0
   leftEnterable: 1
   rightEnterable: 1
   upEnterable: 1
@@ -57,7 +61,6 @@ MonoBehaviour:
   rightExitable: 1
   upExitable: 1
   downExitable: 1
-  floorType: 1
 --- !u!212 &-1684923710603648327
 SpriteRenderer:
   m_ObjectHideFlags: 0

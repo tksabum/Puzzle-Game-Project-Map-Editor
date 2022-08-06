@@ -47,8 +47,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerEnterable: 1
   woodenboxEnterable: 1
+  sturdyboxEnterable: 1
+  steelboxEnterable: 1
   playerExitable: 1
   woodenboxExitable: 1
+  sturdyboxExitable: 1
+  steelboxExitable: 1
   leftEnterable: 1
   rightEnterable: 1
   upEnterable: 1
@@ -57,7 +61,6 @@ MonoBehaviour:
   rightExitable: 1
   upExitable: 1
   downExitable: 1
-  floorType: 5
   powerDefault: 0
   generatorType: 0
   generationCycle: 40

@@ -16,8 +16,6 @@ public class ItemGenerator : Floorbase
     public int generationCycle;
     public BlockManager.Obj product;
 
-    bool isObjectEntered;
-
     private new void Awake()
     {
         base.Awake();
@@ -27,7 +25,6 @@ public class ItemGenerator : Floorbase
 
     void Init()
     {
-        isObjectEntered = false;
         power = powerDefault;
     }
 
@@ -47,22 +44,43 @@ public class ItemGenerator : Floorbase
 
     // 게임시작시 플레이어, 아이템이 위에 있다면 실행되야 함
     // 플레이어 이동시 PreMoveEvent에서 실행되야 함
+
+    public override void OnPreObjectEnter(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj)
+    {
+
+    }
+
     public override void OnObjectEnter(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj)
     {
-        isObjectEntered = true;
+
+    }
+
+    public override void OnPostObjectEnter(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj)
+    {
+
+    }
+
+    public override void OnPreObjectExit(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj)
+    {
+
     }
 
     public override void OnObjectExit(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj)
     {
-        isObjectEntered = false;
+
     }
 
-    public override void PowerToggle(GameManager gameManager)
+    public override void OnPostObjectExit(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj)
+    {
+
+    }
+
+    public override void PowerToggle(GameManager gameManager, BlockManager blockManager)
     {
         power = !power;
 
-        // 전원이 켜질 때 위에 놓여진 아이템이 없는 경우
-        if (generatorType == GeneratorType.POWER && power && !isObjectEntered)
+        // 전원이 켜질 때
+        if (generatorType == GeneratorType.POWER && power)
         {
             GenerateItem(gameManager.blockManager);
         }
@@ -75,7 +93,7 @@ public class ItemGenerator : Floorbase
 
     public void Tick(BlockManager blockManager, int tickCount)
     {
-        if (generatorType == GeneratorType.TIME && tickCount % generationCycle == 0 && !isObjectEntered)
+        if (generatorType == GeneratorType.TIME && tickCount % generationCycle == 0)
         {
             GenerateItem(blockManager);
         }

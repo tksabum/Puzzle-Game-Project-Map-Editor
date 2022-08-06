@@ -17,10 +17,14 @@ public abstract class Floorbase : MonoBehaviour
     [Header("- EnterObject -")]
     public bool playerEnterable;
     public bool woodenboxEnterable;
+    public bool sturdyboxEnterable;
+    public bool steelboxEnterable;
 
     [Header("- ExitObject -")]
     public bool playerExitable;
     public bool woodenboxExitable;
+    public bool sturdyboxExitable;
+    public bool steelboxExitable;
 
     [Header("- EnterDirection -")]
     public bool leftEnterable;
@@ -34,50 +38,12 @@ public abstract class Floorbase : MonoBehaviour
     public bool upExitable;
     public bool downExitable;
 
-    [Header(" - ETC -")]
-    public FloorType floorType;
-
-    protected bool occurInPreEvent;
-    protected bool occurInEvent;
-    protected bool occurInPostEvent;
-
     protected Vector2Int idx;
     protected bool power;
 
     protected void Awake()
     {
         //power = false;
-
-        if (floorType == FloorType.PLANE)
-        {
-            occurInPreEvent = false;
-            occurInEvent = false;
-            occurInPostEvent = true;
-        }
-        else if (floorType == FloorType.WATER)
-        {
-            occurInPreEvent = false;
-            occurInEvent = false;
-            occurInPostEvent = true;
-        }
-        else if (floorType == FloorType.BUTTON)
-        {
-            occurInPreEvent = false;
-            occurInEvent = false;
-            occurInPostEvent = true;
-        }
-        else if (floorType == FloorType.TRAP)
-        {
-            occurInPreEvent = false;
-            occurInEvent = true;
-            occurInPostEvent = false;
-        }
-        else if (floorType == FloorType.PORTAL)
-        {
-            occurInPreEvent = false;
-            occurInEvent = false;
-            occurInPostEvent = true;
-        }
     }
 
     // Update is called once per frame
@@ -91,21 +57,6 @@ public abstract class Floorbase : MonoBehaviour
         idx = _idx;
     }
 
-    public bool GetOccurInPreEvent()
-    {
-        return occurInPreEvent;
-    }
-
-    public bool GetOccurInEvent()
-    {
-        return occurInEvent;
-    }
-
-    public bool GetOccurInPostEvent()
-    {
-        return occurInPostEvent;
-    }
-
     // 들어갈 수 있는지 판단
     public bool Enterable(BlockManager.Obj obj, BlockManager.Direction dir)
     {
@@ -117,6 +68,14 @@ public abstract class Floorbase : MonoBehaviour
         else if (obj == BlockManager.Obj.WOODENBOX)
         {
             if (!woodenboxEnterable) return false;
+        }
+        else if (obj == BlockManager.Obj.STURDYBOX)
+        {
+            if (!sturdyboxEnterable) return false;
+        }
+        else if (obj == BlockManager.Obj.STEELBOX)
+        {
+            if (!steelboxEnterable) return false;
         }
         else
         {
@@ -144,6 +103,14 @@ public abstract class Floorbase : MonoBehaviour
         {
             if (!woodenboxExitable) return false;
         }
+        else if (obj == BlockManager.Obj.STURDYBOX)
+        {
+            if (!sturdyboxExitable) return false;
+        }
+        else if (obj == BlockManager.Obj.STEELBOX)
+        {
+            if (!steelboxExitable) return false;
+        }
         else
         {
             throw new System.Exception("적절한 오브젝트 찾지 못함");
@@ -160,10 +127,14 @@ public abstract class Floorbase : MonoBehaviour
     }
 
     // 오브젝트가 올라오면 실행
+    public abstract void OnPreObjectEnter(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj);
     public abstract void OnObjectEnter(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj);
+    public abstract void OnPostObjectEnter(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj);
 
     // 오브젝트가 나가면 실행
+    public abstract void OnPreObjectExit(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj);
     public abstract void OnObjectExit(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj);
+    public abstract void OnPostObjectExit(GameManager gameManager, BlockManager blockManager, BlockManager.Obj obj);
 
-    public abstract void PowerToggle(GameManager gameManager);
+    public abstract void PowerToggle(GameManager gameManager, BlockManager blockManager);
 }
