@@ -465,6 +465,14 @@ public class BlockManager : MonoBehaviour
         {
             objName = "Life";
         }
+        else if (obj == Obj.STURDYBOX)
+        {
+            objName = "SturdyBox";
+        }
+        else if (obj == Obj.STEELBOX)
+        {
+            objName = "SteelBox";
+        }
 
         if (objName == "")
         {

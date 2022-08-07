@@ -1225,15 +1225,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3e7644f83bf1bf458b432dfcfd89274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: {x: 3, y: 2}
-  titleSprite: {fileID: 436230709, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
+  size: {x: 5, y: 2}
+  titleSprite: {fileID: 1291486903, guid: d2e6c009b28d1414a818bf3675b5820a, type: 3}
   sprites:
-  - {fileID: 436230709, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
-  - {fileID: -1532822094, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
-  - {fileID: 1007372975, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
-  - {fileID: -295662073, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
-  - {fileID: -382282289, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
-  - {fileID: 1175780195, guid: 03e22b3a7ae116141a21f848f721009b, type: 3}
+  - {fileID: 1291486903, guid: d2e6c009b28d1414a818bf3675b5820a, type: 3}
+  - {fileID: 1946496871, guid: d2e6c009b28d1414a818bf3675b5820a, type: 3}
+  - {fileID: 1239056028, guid: d2e6c009b28d1414a818bf3675b5820a, type: 3}
+  - {fileID: -1812932586, guid: d2e6c009b28d1414a818bf3675b5820a, type: 3}
+  - {fileID: -1663978618, guid: d2e6c009b28d1414a818bf3675b5820a, type: 3}
+  - {fileID: 966395362, guid: d2e6c009b28d1414a818bf3675b5820a, type: 3}
+  - {fileID: -1939074797, guid: d2e6c009b28d1414a818bf3675b5820a, type: 3}
+  - {fileID: 47672054, guid: d2e6c009b28d1414a818bf3675b5820a, type: 3}
+  - {fileID: 594828070, guid: d2e6c009b28d1414a818bf3675b5820a, type: 3}
+  - {fileID: -1300945539, guid: d2e6c009b28d1414a818bf3675b5820a, type: 3}
 --- !u!1 &99770762
 GameObject:
   m_ObjectHideFlags: 0
